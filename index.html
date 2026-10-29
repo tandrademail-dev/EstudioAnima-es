@@ -226,18 +226,74 @@ const HOOK_STYLES = [
 // Apenas sobreposições que fazem sentido como clip isolado e transparente.
 // (zoom na imagem ficou de fora de propósito — isso fazes tu no Premiere,
 // sobre o vídeo real; aqui exportamos só o que se SOBREPÕE ao vídeo.)
+// Catálogo de animações. "kind" escolhe a função de desenho (FAMILIES, mais
+// abaixo); vários tipos partilham a mesma função com textos/ícones por
+// omissão diferentes — tal como numa biblioteca de stickers. Todos os tipos
+// aceitam ainda os controlos universais (posição X/Y, escala, rotação,
+// opacidade, cor) para edição ao máximo, independentemente do "kind".
+const TXT = ['text', 'Texto'];
 const EXTRAS = {
-  numero:     { cat: 'ov', name: 'Número grande', desc: 'Conta até ao valor indicado', dur: 2.4, y: .36, text: '4.258€', text2: 'faturados num mês', f: [['text', 'Número'], ['text2', 'Legenda']] },
-  riscado:    { cat: 'ov', name: 'Palavra riscada', desc: 'Risca uma ideia e mostra a certa', dur: 2.4, y: .4, text: 'mais horas', text2: 'melhor sistema', f: [['text', 'Riscar'], ['text2', 'Substituir por']] },
-  lista:      { cat: 'ov', name: 'Lista', desc: 'Itens a aparecer com visto', dur: 3.2, y: .36, text: 'Orçamento claro|Prazo cumprido|Zero surpresas', f: [['text', 'Itens (separa com |)']] },
-  cartao:     { cat: 'ov', name: 'Cartão de cor', desc: 'Frase forte num bloco de cor', dur: 1.8, y: .42, text: 'o sonho', f: [['text', 'Texto']] },
-  mensagem:   { cat: 'ov', name: 'Mensagem', desc: 'A escrever… e depois a mensagem', dur: 3, y: .32, text: 'Quando podemos começar?', text2: 'Cliente', f: [['text', 'Mensagem'], ['text2', 'Remetente']] },
-  comentario: { cat: 'ov', name: 'Comentário', desc: 'Pop-up de comentário de um seguidor', dur: 2.8, y: .3, text: 'isto mudou a minha forma de trabalhar 🔥', text2: 'ana.ferreira', f: [['text', 'Comentário'], ['text2', 'Utilizador']] },
-  carimbo:    { cat: 'ov', name: 'Carimbo', desc: 'Uma palavra carimbada no ecrã', dur: 1.5, y: .4, text: 'aprovado', f: [['text', 'Palavra']] },
-  nota:       { cat: 'ov', name: 'Nota manuscrita', desc: 'Um post-it escrito à mão', dur: 2.5, y: .42, text: 'não te esqueças disto', f: [['text', 'Texto']] },
-  emoji:      { cat: 'ov', name: 'Emoji', desc: 'Emoji grande com salto', dur: 1.2, y: .32, text: '🤯', f: [['text', 'Emoji']] },
-  flash:      { cat: 'mo', name: 'Flash', desc: 'Clarão branco — ótimo em "modo adição" numa transição', dur: .45, f: [] },
-  barra:      { cat: 'mo', name: 'Barra de progresso', desc: 'Linha que avança no topo, do início ao fim do vídeo', dur: 0, global: true, f: [] },
+  // -- texto / cartões --
+  cartao:          { cat: 'ov', kind: 'cartao', name: 'Cartão de cor', desc: 'Frase forte num bloco de cor', dur: 1.8, y: .42, text: 'o sonho', f: [TXT] },
+  'chamada-accao': { cat: 'ov', kind: 'cartao', name: 'Chamada à ação', desc: 'Cartão igual, pronto para um CTA', dur: 1.8, y: .42, text: 'SEGUE PARA MAIS', f: [TXT] },
+  numero:          { cat: 'ov', kind: 'numero', name: 'Número grande', desc: 'Conta até ao valor indicado', dur: 2.4, y: .36, text: '4.258€', text2: 'faturados num mês', f: [['text', 'Número'], ['text2', 'Legenda']] },
+  percentagem:     { cat: 'ov', kind: 'numero', name: 'Percentagem', desc: 'Conta até uma percentagem', dur: 2.2, y: .36, text: '87%', text2: 'taxa de satisfação', f: [['text', 'Número'], ['text2', 'Legenda']] },
+  riscado:         { cat: 'ov', kind: 'riscado', name: 'Palavra riscada', desc: 'Risca uma ideia e mostra a certa', dur: 2.4, y: .4, text: 'mais horas', text2: 'melhor sistema', f: [['text', 'Riscar'], ['text2', 'Substituir por']] },
+  'antes-depois-texto': { cat: 'ov', kind: 'riscado', name: 'Antes → Depois', desc: 'Mesma animação, para contrastes', dur: 2.4, y: .4, text: 'lento', text2: 'instantâneo', f: [['text', 'Antes'], ['text2', 'Depois']] },
+  lista:           { cat: 'ov', kind: 'lista', name: 'Lista', desc: 'Itens a aparecer com visto', dur: 3.2, y: .36, text: 'Orçamento claro|Prazo cumprido|Zero surpresas', f: [['text', 'Itens (separa com |)']] },
+  'lista-passos':  { cat: 'ov', kind: 'lista', name: 'Passo a passo', desc: 'Mesma lista, para passos numerados', dur: 3.2, y: .36, text: 'Marca reunião|Assina proposta|Começamos', f: [['text', 'Itens (separa com |)']] },
+  // -- conversas / prova social --
+  mensagem:        { cat: 'ov', kind: 'mensagem', name: 'Mensagem', desc: 'A escrever… e depois a mensagem', dur: 3, y: .32, x: .14, text: 'Quando podemos começar?', text2: 'Cliente', f: [['text', 'Mensagem'], ['text2', 'Remetente']] },
+  'mensagem-pedido': { cat: 'ov', kind: 'mensagem', name: 'Pedido por mensagem', desc: 'Mesma bolha, para pedidos', dur: 3, y: .32, x: .14, text: 'Consegues enviar-me o orçamento?', text2: 'Cliente', f: [['text', 'Mensagem'], ['text2', 'Remetente']] },
+  comentario:      { cat: 'ov', kind: 'comentario', name: 'Comentário', desc: 'Pop-up de comentário de um seguidor', dur: 2.8, y: .3, text: 'isto mudou a minha forma de trabalhar 🔥', text2: 'ana.ferreira', f: [['text', 'Comentário'], ['text2', 'Utilizador']] },
+  review:          { cat: 'ov', kind: 'comentario', name: 'Avaliação 5 estrelas', desc: 'Mesmo cartão, para reviews', dur: 2.8, y: .3, text: '★★★★★ Recomendo a 100%!', text2: 'cliente satisfeito', f: [['text', 'Avaliação'], ['text2', 'Utilizador']] },
+  // -- carimbos / notas --
+  carimbo:         { cat: 'ov', kind: 'carimbo', name: 'Carimbo', desc: 'Uma palavra carimbada no ecrã', dur: 1.5, y: .4, text: 'aprovado', f: [TXT] },
+  'carimbo-urgente': { cat: 'ov', kind: 'carimbo', name: 'Carimbo urgente', desc: 'Mesmo carimbo, para urgência', dur: 1.5, y: .4, text: 'urgente', color: '#FF5D5D', f: [TXT] },
+  nota:            { cat: 'ov', kind: 'nota', name: 'Nota manuscrita', desc: 'Um post-it escrito à mão', dur: 2.5, y: .42, text: 'não te esqueças disto', f: [TXT] },
+  'nota-dica':     { cat: 'ov', kind: 'nota', name: 'Nota · dica rápida', desc: 'Mesmo post-it, para dicas', dur: 2.5, y: .42, text: 'dica: faz isto primeiro', f: [TXT] },
+  // -- emoji --
+  emoji:           { cat: 'ov', kind: 'emoji', name: 'Emoji', desc: 'Emoji grande com salto', dur: 1.2, y: .32, text: '🤯', f: [['text', 'Emoji']] },
+  reacao:          { cat: 'ov', kind: 'emoji', name: 'Reação', desc: 'Mesmo emoji, para reações', dur: 1.2, y: .32, text: '😍', f: [['text', 'Emoji']] },
+  // -- etiquetas / badges --
+  'badge-novo':      { cat: 'ov', kind: 'badge', name: 'Etiqueta · Novo', desc: 'Pequena etiqueta, entra com salto', dur: 1.6, y: .22, text: 'NOVO', f: [TXT] },
+  'badge-promo':     { cat: 'ov', kind: 'badge', name: 'Etiqueta · Promoção', desc: 'Mesma etiqueta, para promoções', dur: 1.6, y: .22, text: 'PROMOÇÃO', f: [TXT] },
+  'badge-esgotado':  { cat: 'ov', kind: 'badge', name: 'Etiqueta · Esgotado', desc: 'Mesma etiqueta, cor de aviso', dur: 1.6, y: .22, text: 'ESGOTADO', color: '#FF5D5D', f: [TXT] },
+  'badge-desconto':  { cat: 'ov', kind: 'badge', name: 'Etiqueta · Desconto', desc: 'Mesma etiqueta, para % de desconto', dur: 1.6, y: .22, text: '-20%', f: [TXT] },
+  'badge-top':       { cat: 'ov', kind: 'badge', name: 'Etiqueta · Top', desc: 'Mesma etiqueta, para destaques', dur: 1.6, y: .22, text: 'TOP', f: [TXT] },
+  'badge-gratis':    { cat: 'ov', kind: 'badge', name: 'Etiqueta · Grátis', desc: 'Mesma etiqueta, para ofertas', dur: 1.6, y: .22, text: 'GRÁTIS', f: [TXT] },
+  'badge-limitado':  { cat: 'ov', kind: 'badge', name: 'Etiqueta · Limitado', desc: 'Mesma etiqueta, para edições limitadas', dur: 1.6, y: .22, text: 'EDIÇÃO LIMITADA', f: [TXT] },
+  // -- destaque de palavra / seta --
+  'destaque-sublinhado': { cat: 'ov', kind: 'underline', name: 'Palavra sublinhada', desc: 'Palavra com traço de cor animado', dur: 1.8, y: .4, text: 'resultado', f: [TXT] },
+  'destaque-garantia':   { cat: 'ov', kind: 'underline', name: 'Palavra · garantia', desc: 'Mesmo destaque, para garantias', dur: 1.8, y: .4, text: 'garantido', f: [TXT] },
+  'seta-swipe':  { cat: 'ov', kind: 'arrow', name: 'Seta · desliza', desc: 'Seta a saltar, convida a deslizar', dur: 2.2, y: .78, text: 'desliza para cima', f: [['text', 'Legenda']] },
+  'seta-aponta': { cat: 'ov', kind: 'arrow', name: 'Seta · aponta aqui', desc: 'Mesma seta, para apontar algo', dur: 2.2, y: .78, text: 'repara aqui', f: [['text', 'Legenda']] },
+  // -- ícones a pulsar (ótimos para reações rápidas) --
+  'icon-coracao':  { cat: 'ov', kind: 'iconpulse', name: 'Coração a pulsar', desc: 'Ícone num círculo a pulsar', dur: 1.8, y: .4, text: '❤️', color: '#FF5D7A', f: [['text', 'Emoji']] },
+  'icon-estrela':  { cat: 'ov', kind: 'iconpulse', name: 'Estrela a pulsar', desc: 'Mesmo círculo, para estrelas', dur: 1.8, y: .4, text: '⭐', color: '#F4D23C', f: [['text', 'Emoji']] },
+  'icon-fogo':     { cat: 'ov', kind: 'iconpulse', name: 'Fogo a pulsar', desc: 'Mesmo círculo, para "em alta"', dur: 1.8, y: .4, text: '🔥', color: '#FF7A45', f: [['text', 'Emoji']] },
+  'icon-check':    { cat: 'ov', kind: 'iconpulse', name: 'Visto a pulsar', desc: 'Mesmo círculo, para confirmações', dur: 1.8, y: .4, text: '✅', color: '#3DDC84', f: [['text', 'Emoji']] },
+  'icon-aviso':    { cat: 'ov', kind: 'iconpulse', name: 'Aviso a pulsar', desc: 'Mesmo círculo, para avisos', dur: 1.8, y: .4, text: '⚠️', color: '#FFB020', f: [['text', 'Emoji']] },
+  'icon-ideia':    { cat: 'ov', kind: 'iconpulse', name: 'Ideia a pulsar', desc: 'Mesmo círculo, para dicas', dur: 1.8, y: .4, text: '💡', color: '#F4D23C', f: [['text', 'Emoji']] },
+  'icon-dinheiro': { cat: 'ov', kind: 'iconpulse', name: 'Dinheiro a pulsar', desc: 'Mesmo círculo, para faturação', dur: 1.8, y: .4, text: '💰', color: '#3DDC84', f: [['text', 'Emoji']] },
+  'icon-relogio':  { cat: 'ov', kind: 'iconpulse', name: 'Relógio a pulsar', desc: 'Mesmo círculo, para urgência/tempo', dur: 1.8, y: .4, text: '⏱️', color: '#7DD3FC', f: [['text', 'Emoji']] },
+  'icon-alvo':     { cat: 'ov', kind: 'iconpulse', name: 'Alvo a pulsar', desc: 'Mesmo círculo, para objetivos', dur: 1.8, y: .4, text: '🎯', color: '#F7893B', f: [['text', 'Emoji']] },
+  'icon-foguete':  { cat: 'ov', kind: 'iconpulse', name: 'Foguete a pulsar', desc: 'Mesmo círculo, para crescimento', dur: 1.8, y: .4, text: '🚀', color: '#C13584', f: [['text', 'Emoji']] },
+  'icon-gosto':    { cat: 'ov', kind: 'iconpulse', name: 'Gosto a pulsar', desc: 'Mesmo círculo, para "gosto"', dur: 1.8, y: .4, text: '👍', color: '#7DD3FC', f: [['text', 'Emoji']] },
+  'icon-trofeu':   { cat: 'ov', kind: 'iconpulse', name: 'Troféu a pulsar', desc: 'Mesmo círculo, para conquistas', dur: 1.8, y: .4, text: '🏆', color: '#F4D23C', f: [['text', 'Emoji']] },
+  'icon-pergunta': { cat: 'ov', kind: 'iconpulse', name: 'Dúvida a pulsar', desc: 'Mesmo círculo, para perguntas', dur: 1.8, y: .4, text: '❓', color: '#8A3AB9', f: [['text', 'Emoji']] },
+  // -- dados / comparação --
+  'anel-progresso': { cat: 'ov', kind: 'anel', name: 'Anel de progresso', desc: 'Círculo que enche até à percentagem', dur: 2, y: .4, text: '80', text2: 'satisfação', f: [['text', 'Percentagem (0-100)'], ['text2', 'Legenda']] },
+  'barras-comparar': { cat: 'ov', kind: 'barras', name: 'Barras a comparar', desc: 'Duas ou três barras a crescer', dur: 2.2, y: .4, text: 'Antes:30|Depois:90', f: [['text', 'Itens (nome:valor, separa com |)']] },
+  citacao:         { cat: 'ov', kind: 'citacao', name: 'Citação', desc: 'Aspas grandes + frase', dur: 3.5, y: .38, text: 'Isto mudou por completo a forma como trabalhamos.', f: [TXT] },
+  'divisor-antes':  { cat: 'ov', kind: 'divisor', name: 'Divisor · Antes', desc: 'Linha com rótulo ao centro', dur: 1.6, y: .4, text: 'ANTES', f: [TXT] },
+  'divisor-depois': { cat: 'ov', kind: 'divisor', name: 'Divisor · Depois', desc: 'Mesmo divisor, para "depois"', dur: 1.6, y: .4, text: 'DEPOIS', f: [TXT] },
+  'moldura-destaque': { cat: 'ov', kind: 'moldura', name: 'Moldura de destaque', desc: 'Cantos que desenham um foco', dur: 2, y: .4, text: '', f: [] },
+  'faixa-noticias': { cat: 'ov', kind: 'ticker', name: 'Faixa tipo notícia', desc: 'Texto a correr, estilo breaking news', dur: 4, y: .86, text: 'ÚLTIMA HORA · ' , f: [['text', 'Texto a correr']] },
+  'contagem-decrescente': { cat: 'ov', kind: 'countdown', name: 'Contagem decrescente', desc: 'Número grande a contar para trás', dur: 3.4, y: .4, text: '3', f: [['text', 'Começa em (nº)']] },
+  // -- transições (ocupam o ecrã todo) --
+  flash:      { cat: 'mo', kind: 'flash', name: 'Flash', desc: 'Clarão branco — ótimo em "modo adição" numa transição', dur: .45, f: [] },
+  barra:      { cat: 'mo', kind: 'barra', name: 'Barra de progresso', desc: 'Linha que avança no topo, do início ao fim do vídeo', dur: 0, global: true, f: [] },
 };
 const LOOKS = [
   { id: 'fundador', name: 'Fundador', desc: 'Direto, amarelo', palette: 'limao', font: 'impacto', hook: 'duo' },
@@ -403,122 +459,249 @@ function drawHook(ctx, s, t) {
   ctx.restore();
 }
 
-/* ---------- Extras (sobreposições/overlays) ---------- */
+/* ---------- Extras (sobreposições/overlays) ----------
+   Cada "família" desenha à volta da origem local (0,0): o wrapper
+   drawExtra() já tratou da posição X/Y, escala, rotação e opacidade
+   universais antes de chamar a família, por isso aqui é sempre 0,0. */
 function drawExtra(ctx, s, e, t) {
   const lt = t - e.start; if (lt < 0 || lt > e.dur) return;
-  const P = pal(s), F = fnt(s);
-  const inA = eOut(lt / .3), out = clamp((e.dur - lt) / .25), A = Math.min(inA, out);
-  const Y = (e.y ?? .4) * 1920;
-  ctx.save(); ctx.globalAlpha = A; ctx.textAlign = 'center';
-  switch (e.type) {
-    case 'nota': {
-      ctx.font = '700 72px Caveat, cursive'; const lines = wrap(ctx, e.text, 560).slice(0, 4);
-      const w = 660, h = 110 + lines.length * 78;
-      ctx.translate(540, Y); ctx.rotate(-.06 + (1 - eBack(lt / .4)) * .1); ctx.scale(.9 + .1 * eBack(lt / .35), .9 + .1 * eBack(lt / .35));
-      shadow(ctx, true, 30, .4); ctx.fillStyle = '#FFF4C7'; ctx.fillRect(-w / 2, -h / 2, w, h); shadow(ctx, false);
-      ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillRect(-70, -h / 2 - 22, 140, 44);
-      const rev = clamp((lt - .15) / .9);
-      ctx.save(); ctx.beginPath(); ctx.rect(-w / 2, -h / 2, w * rev, h); ctx.clip();
-      ctx.fillStyle = '#1d2a5c'; lines.forEach((l, i) => ctx.fillText(l, 0, -h / 2 + 100 + i * 78));
-      ctx.restore(); break;
-    }
-    case 'cartao': {
-      const T = caseT(e.text, F.upper); ctx.font = fs(F.d, 110); const lines = wrap(ctx, T, 700).slice(0, 3);
-      const sz = Math.min(110, ...lines.map(l => fitFont(ctx, F.d, l, 110, 700)));
-      const w = 820, h = 150 + lines.length * sz * 1.08;
-      const yy = Y + (1 - eOut(lt / .35)) * 120;
-      shadow(ctx, true, 40, .35); ctx.fillStyle = P.card; rr(ctx, 540 - w / 2, yy - h / 2, w, h, 26); ctx.fill(); shadow(ctx, false);
-      ctx.fillStyle = P.cardInk; ctx.font = fs(F.d, sz);
-      lines.forEach((l, i) => ctx.fillText(l, 540, yy - h / 2 + 75 + sz * .8 + i * sz * 1.08)); break;
-    }
-    case 'carimbo': {
-      const T = String(e.text).toLocaleUpperCase('pt-PT');
-      const sz = fitFont(ctx, F.d, T, 120, 760); const w = ctx.measureText(T).width + 80, h = sz * 1.45;
-      const sc = 1 + .9 * (1 - eOut(lt / .22));
-      ctx.translate(540, Y); ctx.rotate(-.14); ctx.scale(sc, sc);
-      ctx.globalAlpha = A * .95; ctx.strokeStyle = P.accent; ctx.lineWidth = 12; rr(ctx, -w / 2, -h / 2, w, h, 14); ctx.stroke();
-      ctx.lineWidth = 4; rr(ctx, -w / 2 + 16, -h / 2 + 16, w - 32, h - 32, 8); ctx.stroke();
-      ctx.fillStyle = P.accent; ctx.textBaseline = 'middle'; ctx.fillText(T, 0, 6); break;
-    }
-    case 'numero': {
-      const raw = String(e.text); const m = raw.match(/\d[\d.,\s]*/);
-      let shown = raw;
-      if (m) {
-        const digits = m[0].replace(/[^\d]/g, ''), target = parseInt(digits, 10) || 0;
-        const hasSep = /[.\s]\d{3}/.test(m[0]);
-        const cur = Math.round(target * eOut(lt / 1.1));
-        const curStr = hasSep ? String(cur).replace(/\B(?=(\d{3})+(?!\d))/g, '.') : String(cur);
-        shown = raw.slice(0, m.index) + curStr + raw.slice(m.index + m[0].trimEnd().length);
-      }
-      shadow(ctx, true, 30, .5);
-      fitFont(ctx, F.d, raw, 250, 960); ctx.fillStyle = P.accent; ctx.fillText(shown, 540, Y);
-      if (e.text2) { const s2 = fitFont(ctx, F.b, e.text2, 54, 900); ctx.fillStyle = P.text; ctx.fillText(e.text2, 540, Y + s2 * 1.5); }
-      break;
-    }
-    case 'comentario': {
-      ctx.font = `500 44px ${SANS}`; const lines = wrap(ctx, e.text, 640).slice(0, 4);
-      const w = 860, h = 150 + lines.length * 58, sc = .7 + .3 * eBack(lt / .3);
-      ctx.translate(540, Y); ctx.scale(sc, sc);
-      shadow(ctx, true, 40, .35); ctx.fillStyle = '#fff'; rr(ctx, -w / 2, -h / 2, w, h, 36); ctx.fill(); shadow(ctx, false);
-      const ax = -w / 2 + 70, ay = -h / 2 + 72;
-      ctx.fillStyle = P.accent; ctx.beginPath(); ctx.arc(ax, ay, 38, 0, 7); ctx.fill();
-      ctx.fillStyle = P.ink; ctx.font = `800 36px ${SANS}`; ctx.textBaseline = 'middle'; ctx.fillText((e.text2 || '?')[0].toUpperCase(), ax, ay + 2);
-      ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-      ctx.fillStyle = '#111'; ctx.font = `700 36px ${SANS}`; ctx.fillText(e.text2 || 'utilizador', ax + 58, ay - 4);
-      ctx.fillStyle = '#8a8a8a'; ctx.font = `500 28px ${SANS}`; ctx.fillText('agora', ax + 58, ay + 32);
-      ctx.fillStyle = '#222'; ctx.font = `500 44px ${SANS}`; lines.forEach((l, i) => ctx.fillText(l, -w / 2 + 42, -h / 2 + 170 + i * 58));
-      ctx.fillStyle = '#ff3b5c'; ctx.font = `40px ${SANS}`; ctx.textAlign = 'right'; ctx.fillText('♥', w / 2 - 40, -h / 2 + 84); break;
-    }
-    case 'mensagem': {
-      const typing = lt < .9;
-      ctx.font = `500 46px ${SANS}`; const lines = typing ? [''] : wrap(ctx, e.text, 620).slice(0, 4);
-      const tw = typing ? 150 : Math.max(...lines.map(l => ctx.measureText(l).width)) + 76;
-      const h = typing ? 100 : 46 + lines.length * 60, x = 110, sc = .8 + .2 * eBack(lt / .25);
-      ctx.translate(x, Y); ctx.scale(sc, sc); ctx.textAlign = 'left';
-      if (e.text2) { shadow(ctx, true, 12, .6); ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.font = `600 30px ${SANS}`; ctx.fillText(e.text2, 20, -h / 2 - 18); shadow(ctx, false); }
-      shadow(ctx, true, 30, .3); ctx.fillStyle = '#ECECEE'; rr(ctx, 0, -h / 2, tw, h, 40); ctx.fill(); shadow(ctx, false);
-      if (typing) { for (let i = 0; i < 3; i++) { const b = Math.sin(lt * 10 - i * .8) * .5 + .5; ctx.fillStyle = `rgba(80,80,90,${.35 + b * .5})`; ctx.beginPath(); ctx.arc(42 + i * 34, -b * 8, 11, 0, 7); ctx.fill(); } }
-      else { ctx.fillStyle = '#111'; ctx.font = `500 46px ${SANS}`; lines.forEach((l, i) => ctx.fillText(l, 38, -h / 2 + 64 + i * 60)); }
-      break;
-    }
-    case 'riscado': {
-      shadow(ctx, true);
-      const T1 = caseT(e.text, F.upper), sz = fitFont(ctx, F.d, T1, 120, 900), w = ctx.measureText(T1).width;
-      ctx.fillStyle = P.text; ctx.globalAlpha = A * (lt > .7 ? .55 : 1); ctx.fillText(T1, 540, Y);
-      const p = eOut((lt - .3) / .4); shadow(ctx, false); ctx.globalAlpha = A;
-      ctx.fillStyle = P.accent; rr(ctx, 540 - w / 2 - 10, Y - sz * .38, (w + 20) * p, Math.max(10, sz * .11), 6); ctx.fill();
-      const t2 = e.t2 ?? .75;
-      if (e.text2 && lt > t2) {
-        const T2 = caseT(e.text2, F.upper); const s2 = fitFont(ctx, F.d, T2, 120, 900); const sc = eBack((lt - t2) / .25);
-        ctx.save(); ctx.translate(540, Y + s2 * 1.25); ctx.scale(sc, sc); shadow(ctx, true); ctx.fillStyle = P.accent; ctx.fillText(T2, 0, 0); ctx.restore();
-      }
-      break;
-    }
-    case 'lista': {
-      const items = String(e.text).split(/\||\n/).map(x => x.trim()).filter(Boolean).slice(0, 6);
-      const w = 860, h = 70 + items.length * 96;
-      ctx.fillStyle = 'rgba(8,8,8,.78)'; rr(ctx, 540 - w / 2, Y - h / 2, w, h, 30); ctx.fill();
-      ctx.textAlign = 'left';
-      items.forEach((it, i) => {
-        const at = (e.at && e.at[i] != null) ? e.at[i] : .2 + i * .45;
-        const p = eOut((lt - at) / .3); if (p <= 0) return;
-        const yy = Y - h / 2 + 82 + i * 96; ctx.save(); ctx.globalAlpha = A * p; ctx.translate((1 - p) * 30, 0);
-        ctx.fillStyle = P.accent; rr(ctx, 540 - w / 2 + 44, yy - 40, 54, 54, 14); ctx.fill();
-        ctx.strokeStyle = P.ink; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.beginPath();
-        ctx.moveTo(540 - w / 2 + 58, yy - 13); ctx.lineTo(540 - w / 2 + 68, yy - 2); ctx.lineTo(540 - w / 2 + 86, yy - 26); ctx.stroke();
-        ctx.fillStyle = '#fff'; ctx.font = fs(F.b, fitFont(ctx, F.b, it, 50, 660)); ctx.fillText(it, 540 - w / 2 + 128, yy);
-        ctx.restore();
-      });
-      break;
-    }
-    case 'emoji': {
-      const sc = eBack(lt / .35), rot = Math.sin(lt * 8) * .08 * (1 - clamp(lt / 1));
-      ctx.translate(540, Y); ctx.rotate(rot); ctx.scale(sc, sc);
-      ctx.font = '230px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; ctx.textBaseline = 'middle';
-      ctx.fillText(e.text, 0, 0); break;
-    }
-  }
+  const fam = FAMILIES[e.kind || e.type]; if (!fam) return;
+  const inA = eOut(lt / .3), outA = clamp((e.dur - lt) / .25);
+  const A = Math.min(inA, outA) * clamp(e.opacity ?? 1, 0, 1);
+  if (A <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = A; ctx.textAlign = 'center';
+  ctx.translate((e.x ?? .5) * 1080, (e.y ?? .4) * 1920);
+  if (e.rot) ctx.rotate(e.rot * Math.PI / 180);
+  if (e.scale && e.scale !== 1) ctx.scale(e.scale, e.scale);
+  fam(ctx, s, e, lt, A);
   ctx.restore();
+}
+const FAMILIES = {
+  nota(ctx, s, e, lt, A) {
+    const F = fnt(s);
+    ctx.font = '700 72px Caveat, cursive'; const lines = wrap(ctx, e.text, 560).slice(0, 4);
+    const w = 660, h = 110 + lines.length * 78;
+    ctx.rotate(-.06 + (1 - eBack(lt / .4)) * .1); ctx.scale(.9 + .1 * eBack(lt / .35), .9 + .1 * eBack(lt / .35));
+    shadow(ctx, true, 30, .4); ctx.fillStyle = '#FFF4C7'; ctx.fillRect(-w / 2, -h / 2, w, h); shadow(ctx, false);
+    ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillRect(-70, -h / 2 - 22, 140, 44);
+    const rev = clamp((lt - .15) / .9);
+    ctx.save(); ctx.beginPath(); ctx.rect(-w / 2, -h / 2, w * rev, h); ctx.clip();
+    ctx.fillStyle = '#1d2a5c'; lines.forEach((l, i) => ctx.fillText(l, 0, -h / 2 + 100 + i * 78));
+    ctx.restore();
+  },
+  cartao(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.card, ink = e.color ? bestInk(e.color) : P.cardInk;
+    const T = caseT(e.text, F.upper); ctx.font = fs(F.d, 110); const lines = wrap(ctx, T, 700).slice(0, 3);
+    const sz = Math.min(110, ...lines.map(l => fitFont(ctx, F.d, l, 110, 700)));
+    const w = 820, h = 150 + lines.length * sz * 1.08;
+    const yy = (1 - eOut(lt / .35)) * 120;
+    shadow(ctx, true, 40, .35); ctx.fillStyle = col; rr(ctx, -w / 2, yy - h / 2, w, h, 26); ctx.fill(); shadow(ctx, false);
+    ctx.fillStyle = ink; ctx.font = fs(F.d, sz);
+    lines.forEach((l, i) => ctx.fillText(l, 0, yy - h / 2 + 75 + sz * .8 + i * sz * 1.08));
+  },
+  carimbo(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    const T = String(e.text).toLocaleUpperCase('pt-PT');
+    const sz = fitFont(ctx, F.d, T, 120, 760); const w = ctx.measureText(T).width + 80, h = sz * 1.45;
+    const sc = 1 + .9 * (1 - eOut(lt / .22));
+    ctx.rotate(-.14); ctx.scale(sc, sc);
+    ctx.globalAlpha = A * .95; ctx.strokeStyle = col; ctx.lineWidth = 12; rr(ctx, -w / 2, -h / 2, w, h, 14); ctx.stroke();
+    ctx.lineWidth = 4; rr(ctx, -w / 2 + 16, -h / 2 + 16, w - 32, h - 32, 8); ctx.stroke();
+    ctx.fillStyle = col; ctx.textBaseline = 'middle'; ctx.fillText(T, 0, 6);
+  },
+  numero(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    const raw = String(e.text); const m = raw.match(/\d[\d.,\s]*/);
+    let shown = raw;
+    if (m) {
+      const digits = m[0].replace(/[^\d]/g, ''), target = parseInt(digits, 10) || 0;
+      const hasSep = /[.\s]\d{3}/.test(m[0]);
+      const cur = Math.round(target * eOut(lt / 1.1));
+      const curStr = hasSep ? String(cur).replace(/\B(?=(\d{3})+(?!\d))/g, '.') : String(cur);
+      shown = raw.slice(0, m.index) + curStr + raw.slice(m.index + m[0].trimEnd().length);
+    }
+    shadow(ctx, true, 30, .5);
+    fitFont(ctx, F.d, raw, 250, 960); ctx.fillStyle = col; ctx.fillText(shown, 0, 0);
+    if (e.text2) { const s2 = fitFont(ctx, F.b, e.text2, 54, 900); ctx.fillStyle = P.text; ctx.fillText(e.text2, 0, s2 * 1.5); }
+  },
+  comentario(ctx, s, e, lt, A) {
+    const P = pal(s), col = e.color || P.accent;
+    ctx.font = `500 44px ${SANS}`; const lines = wrap(ctx, e.text, 640).slice(0, 4);
+    const w = 860, h = 150 + lines.length * 58, sc = .7 + .3 * eBack(lt / .3);
+    ctx.scale(sc, sc);
+    shadow(ctx, true, 40, .35); ctx.fillStyle = '#fff'; rr(ctx, -w / 2, -h / 2, w, h, 36); ctx.fill(); shadow(ctx, false);
+    const ax = -w / 2 + 70, ay = -h / 2 + 72;
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(ax, ay, 38, 0, 7); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = `800 36px ${SANS}`; ctx.textBaseline = 'middle'; ctx.fillText((e.text2 || '?')[0].toUpperCase(), ax, ay + 2);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#111'; ctx.font = `700 36px ${SANS}`; ctx.fillText(e.text2 || 'utilizador', ax + 58, ay - 4);
+    ctx.fillStyle = '#8a8a8a'; ctx.font = `500 28px ${SANS}`; ctx.fillText('agora', ax + 58, ay + 32);
+    ctx.fillStyle = '#222'; ctx.font = `500 44px ${SANS}`; lines.forEach((l, i) => ctx.fillText(l, -w / 2 + 42, -h / 2 + 170 + i * 58));
+    ctx.fillStyle = '#ff3b5c'; ctx.font = `40px ${SANS}`; ctx.textAlign = 'right'; ctx.fillText('♥', w / 2 - 40, -h / 2 + 84);
+  },
+  mensagem(ctx, s, e, lt, A) {
+    const typing = lt < .9;
+    ctx.font = `500 46px ${SANS}`; const lines = typing ? [''] : wrap(ctx, e.text, 620).slice(0, 4);
+    const tw = typing ? 150 : Math.max(...lines.map(l => ctx.measureText(l).width)) + 76;
+    const h = typing ? 100 : 46 + lines.length * 60, sc = .8 + .2 * eBack(lt / .25);
+    ctx.scale(sc, sc); ctx.textAlign = 'left';
+    if (e.text2) { shadow(ctx, true, 12, .6); ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.font = `600 30px ${SANS}`; ctx.fillText(e.text2, 20, -h / 2 - 18); shadow(ctx, false); }
+    shadow(ctx, true, 30, .3); ctx.fillStyle = '#ECECEE'; rr(ctx, 0, -h / 2, tw, h, 40); ctx.fill(); shadow(ctx, false);
+    if (typing) { for (let i = 0; i < 3; i++) { const b = Math.sin(lt * 10 - i * .8) * .5 + .5; ctx.fillStyle = `rgba(80,80,90,${.35 + b * .5})`; ctx.beginPath(); ctx.arc(42 + i * 34, -b * 8, 11, 0, 7); ctx.fill(); } }
+    else { ctx.fillStyle = '#111'; ctx.font = `500 46px ${SANS}`; lines.forEach((l, i) => ctx.fillText(l, 38, -h / 2 + 64 + i * 60)); }
+  },
+  riscado(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    shadow(ctx, true);
+    const T1 = caseT(e.text, F.upper), sz = fitFont(ctx, F.d, T1, 120, 900), w = ctx.measureText(T1).width;
+    ctx.fillStyle = P.text; ctx.globalAlpha = A * (lt > .7 ? .55 : 1); ctx.fillText(T1, 0, 0);
+    const p = eOut((lt - .3) / .4); shadow(ctx, false); ctx.globalAlpha = A;
+    ctx.fillStyle = col; rr(ctx, -w / 2 - 10, -sz * .38, (w + 20) * p, Math.max(10, sz * .11), 6); ctx.fill();
+    const t2 = e.t2 ?? .75;
+    if (e.text2 && lt > t2) {
+      const T2 = caseT(e.text2, F.upper); const s2 = fitFont(ctx, F.d, T2, 120, 900); const sc = eBack((lt - t2) / .25);
+      ctx.save(); ctx.translate(0, s2 * 1.25); ctx.scale(sc, sc); shadow(ctx, true); ctx.fillStyle = col; ctx.fillText(T2, 0, 0); ctx.restore();
+    }
+  },
+  lista(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    const items = String(e.text).split(/\||\n/).map(x => x.trim()).filter(Boolean).slice(0, 6);
+    const w = 860, h = 70 + items.length * 96;
+    ctx.fillStyle = 'rgba(8,8,8,.78)'; rr(ctx, -w / 2, -h / 2, w, h, 30); ctx.fill();
+    ctx.textAlign = 'left';
+    items.forEach((it, i) => {
+      const at = .2 + i * .45;
+      const p = eOut((lt - at) / .3); if (p <= 0) return;
+      const yy = -h / 2 + 82 + i * 96; ctx.save(); ctx.globalAlpha = A * p; ctx.translate((1 - p) * 30, 0);
+      ctx.fillStyle = col; rr(ctx, -w / 2 + 44, yy - 40, 54, 54, 14); ctx.fill();
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.beginPath();
+      ctx.moveTo(-w / 2 + 58, yy - 13); ctx.lineTo(-w / 2 + 68, yy - 2); ctx.lineTo(-w / 2 + 86, yy - 26); ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.font = fs(F.b, fitFont(ctx, F.b, it, 50, 660)); ctx.fillText(it, -w / 2 + 128, yy);
+      ctx.restore();
+    });
+  },
+  emoji(ctx, s, e, lt, A) {
+    const sc = eBack(lt / .35), rot = Math.sin(lt * 8) * .08 * (1 - clamp(lt / 1));
+    ctx.rotate(rot); ctx.scale(sc, sc);
+    ctx.font = '230px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; ctx.textBaseline = 'middle';
+    ctx.fillText(e.text, 0, 0);
+  },
+  badge(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    const T = caseT(e.text, true); ctx.font = fs(F.b, 50); const w = ctx.measureText(T).width + 68, h = 90;
+    const sc = eBack(lt / .25); ctx.scale(sc, sc);
+    shadow(ctx, true, 20, .4); ctx.fillStyle = col; rr(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.fill(); shadow(ctx, false);
+    ctx.fillStyle = bestInk(col); ctx.textBaseline = 'middle'; ctx.fillText(T, 0, 2);
+  },
+  underline(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    shadow(ctx, true);
+    const T = caseT(e.text, F.upper); ctx.font = fs(F.d, 108); const w = ctx.measureText(T).width;
+    ctx.fillStyle = P.text; ctx.fillText(T, 0, 0);
+    shadow(ctx, false);
+    const p = eOut((lt - .18) / .35);
+    ctx.fillStyle = col; rr(ctx, -w / 2, 20, w * p, 16, 7); ctx.fill();
+  },
+  arrow(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    const by = Math.sin(lt * 5) * 16 - 10 * clamp(lt / .3);
+    ctx.save(); ctx.translate(0, by);
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.moveTo(0, -46); ctx.lineTo(30, 6); ctx.lineTo(11, 6); ctx.lineTo(11, 48); ctx.lineTo(-11, 48); ctx.lineTo(-11, 6); ctx.lineTo(-30, 6); ctx.closePath(); ctx.fill();
+    ctx.restore();
+    if (e.text) { shadow(ctx, true); ctx.font = fs(F.b, 42); ctx.fillStyle = P.text; ctx.fillText(caseT(e.text, F.upper), 0, 102); shadow(ctx, false); }
+  },
+  iconpulse(ctx, s, e, lt, A) {
+    const P = pal(s), col = e.color || P.accent;
+    const pulse = 1 + .12 * Math.sin(lt * 6.2);
+    ctx.save(); ctx.scale(pulse, pulse);
+    ctx.fillStyle = col + '33'; ctx.beginPath(); ctx.arc(0, 0, 112, 0, 7); ctx.fill();
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(0, 0, 80, 0, 7); ctx.fill();
+    ctx.font = '86px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; ctx.textBaseline = 'middle';
+    ctx.fillText(e.text || '❤️', 0, 4);
+    ctx.restore();
+  },
+  anel(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    const pct = clamp((parseFloat(e.text) || 0) / 100, 0, 1), p = eOut(lt / 1.1) * pct;
+    ctx.lineWidth = 22; ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.arc(0, 0, 92, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = col; ctx.beginPath(); ctx.arc(0, 0, 92, -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = P.text; ctx.font = fs(F.d, 64); ctx.fillText(Math.round(p * 100) + '%', 0, 22);
+    if (e.text2) { ctx.font = fs(F.b, 34); ctx.globalAlpha = A * .8; ctx.fillText(e.text2, 0, 148); ctx.globalAlpha = A; }
+  },
+  barras(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    const items = String(e.text).split('|').map(x => { const [n, v] = x.split(':'); return { n: (n || '').trim(), v: parseFloat(v) || 0 }; }).filter(x => x.n).slice(0, 4);
+    const maxV = Math.max(1, ...items.map(x => x.v)), gap = 56, bw = 120, baseY = 110;
+    const totalW = items.length * bw + (items.length - 1) * gap, x0 = -totalW / 2;
+    ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(x0 - 20, baseY, totalW + 40, 4);
+    items.forEach((it, i) => {
+      const p = eOut((lt - i * .18) / .5), hh = 230 * p * (it.v / maxV);
+      const bx = x0 + i * (bw + gap);
+      ctx.fillStyle = i === items.length - 1 ? col : 'rgba(255,255,255,.35)';
+      rr(ctx, bx, baseY - hh, bw, hh, 10); ctx.fill();
+      ctx.fillStyle = P.text; ctx.font = fs(F.b, 36); ctx.fillText(it.n, bx + bw / 2, baseY + 50);
+      ctx.globalAlpha = A * p; ctx.fillText(String(it.v), bx + bw / 2, baseY - hh - 18); ctx.globalAlpha = A;
+    });
+  },
+  citacao(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    ctx.font = '800 170px Georgia, serif'; ctx.fillStyle = col; ctx.globalAlpha = A * .45; ctx.fillText('“', 0, -60); ctx.globalAlpha = A;
+    ctx.font = fs(F.d, 56); ctx.fillStyle = P.text; const lines = wrap(ctx, e.text, 760).slice(0, 4);
+    shadow(ctx, true); lines.forEach((l, i) => ctx.fillText(l, 0, 20 + i * 66)); shadow(ctx, false);
+  },
+  divisor(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    const T = caseT(e.text, true); ctx.font = fs(F.b, 44); const w = ctx.measureText(T).width;
+    const p = eOut(lt / .3);
+    ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(-440 * p, 0); ctx.lineTo(-w / 2 - 20, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(w / 2 + 20, 0); ctx.lineTo(440 * p, 0); ctx.stroke();
+    ctx.fillStyle = col; ctx.fillText(T, 0, 16);
+  },
+  moldura(ctx, s, e, lt, A) {
+    const P = pal(s), col = e.color || P.accent;
+    const w = 280, h = 280, p = eOut(lt / .3), cl = 64 * p;
+    ctx.strokeStyle = col; ctx.lineWidth = 9; ctx.lineCap = 'round';
+    const corner = (x, y, dx, dy) => { ctx.beginPath(); ctx.moveTo(x, y + dy * cl); ctx.lineTo(x, y); ctx.lineTo(x + dx * cl, y); ctx.stroke(); };
+    corner(-w / 2, -h / 2, 1, 1); corner(w / 2, -h / 2, -1, 1); corner(-w / 2, h / 2, 1, -1); corner(w / 2, h / 2, -1, -1);
+    if (e.text) { ctx.font = fs(fnt(s).b, 34); ctx.fillStyle = P.text; ctx.globalAlpha = A * p; ctx.fillText(caseT(e.text, false), 0, h / 2 + 50); ctx.globalAlpha = A; }
+  },
+  ticker(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    ctx.save(); ctx.beginPath(); ctx.rect(-540, -42, 1080, 84); ctx.clip();
+    ctx.fillStyle = 'rgba(0,0,0,.62)'; ctx.fillRect(-540, -42, 1080, 84);
+    const base = caseT(e.text, true) + '   •   ';
+    ctx.font = fs(F.b, 40); const uw = ctx.measureText(base).width || 1;
+    ctx.textAlign = 'left'; ctx.fillStyle = col;
+    const shift = (lt * 230) % uw;
+    for (let x = -shift - uw; x < 560; x += uw) ctx.fillText(base, x, 15);
+    ctx.restore();
+  },
+  countdown(ctx, s, e, lt, A) {
+    const P = pal(s), F = fnt(s), col = e.color || P.accent;
+    const start = Math.max(1, Math.round(+e.text) || 3);
+    const n = Math.max(0, start - Math.floor(lt));
+    const frac = lt % 1, sc = 1 + .32 * (1 - eOut(frac / .25));
+    ctx.scale(sc, sc); shadow(ctx, true, 30, .5);
+    ctx.font = fs(F.d, 220); ctx.fillStyle = col; ctx.fillText(String(n), 0, 70);
+  },
+  flash(ctx, s, e, lt, A) { drawFlash2(ctx, lt, e.dur); },
+  barra(ctx, s, e, lt, A) { drawBarra2(ctx, s, lt, e.dur); },
+};
+function bestInk(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || ''); if (!m) return '#111';
+  const n = parseInt(m[1], 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return (r * .299 + g * .587 + b * .114) > 150 ? '#111' : '#fff';
+}
+// Variantes locais (origem 0,0) de flash/barra, usadas quando exportadas sozinhas.
+function drawFlash2(ctx, lt, dur) { if (lt >= 0 && lt <= dur) { ctx.fillStyle = `rgba(255,255,255,${(1 - lt / dur) * .95})`; ctx.fillRect(-540, -960, 1080, 1920); } }
+function drawBarra2(ctx, s, t, total) {
+  const p = clamp(t / (total || 1));
+  ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(-540, -960, 1080, 12);
+  ctx.fillStyle = pal(s).accent; ctx.fillRect(-540, -960, 1080 * p, 12);
 }
 
 /* =========================================================
@@ -622,7 +805,7 @@ const cardHTML = (kind, id, name, desc, i, sel, tag = '', extra = '') =>
     <div class="meta"><b>${esc(name)}</b><span>${esc(desc)}</span>${extra}</div></button>`;
 
 /* ---------------- Assistente por passos ---------------- */
-let step = 0, xTab = 'ov';
+let step = 0, xTab = 'ov', animQuery = '';
 function renderTabs() {
   $('#tabs').innerHTML = STEPS.map((s, i) =>
     `<button class="tab${i === step ? ' on' : ''}${st.done.includes(s.id) && i !== step ? ' done' : ''}" data-step="${i}">${s.tab}</button>`).join('');
@@ -695,18 +878,28 @@ function renderPanel() {
     </div></div>
     <div class="grid">${HOOK_STYLES.map((s, i) => cardHTML('hook', s.id, s.name, s.desc, i + 1, H.style === s.id)).join('')}</div>`;
   } else if (id === 'animacoes') {
-    const list = Object.entries(EXTRAS).filter(([, d]) => d.cat === xTab);
-    h = `<h2>Animações na <em>timeline</em></h2><p class="lead">Move o vídeo até ao momento certo (usa a pré-visualização à esquerda) e clica numa animação para a colocar nesse instante. Cada uma fica guardada com o segundo onde entra.</p>
+    const q = (animQuery || '').toLocaleLowerCase('pt-PT');
+    const list = Object.entries(EXTRAS).filter(([, d]) => d.cat === xTab && (!q || d.name.toLocaleLowerCase('pt-PT').includes(q) || d.desc.toLocaleLowerCase('pt-PT').includes(q)));
+    const totalOv = Object.values(EXTRAS).filter(d => d.cat === 'ov').length;
+    h = `<h2>Animações na <em>timeline</em></h2><p class="lead">Liberdade total: move o vídeo para qualquer instante (usa a pré-visualização à esquerda ou escreve o segundo exato depois de adicionares) e clica numa animação para a colocar ali. Podes repetir o mesmo tipo quantas vezes quiseres, em qualquer momento. ${totalOv} tipos de sobreposição disponíveis.</p>
     <div class="box"><h3>No teu vídeo (${st.extras.length})</h3><div class="xlist">${st.extras.length ? [...st.extras].sort((a, b) => a.start - b.start).map(e => {
       const d = EXTRAS[e.type];
       return `<div class="xitem" data-x="${e.id}"><div class="hd"><b>${d.name}</b>${d.global ? '<span class="time">vídeo inteiro</span>' : `<button class="btn sm" data-xgo="${e.id}">▶ ${fmt1(e.start)}</button>`}<button class="btn sm" data-xdel="${e.id}">Remover</button></div>
       ${(d.f.length || !d.global) ? `<div class="row">${d.f.map(([k, l]) => `<div class="field"><label>${l}</label><input type="text" data-xf="${k}" value="${esc(e[k])}"></div>`).join('')}
-      ${d.global ? '' : `<div class="field num"><label>Início (s)</label><input type="number" data-xf="start" step=".1" min="0" value="${(+e.start).toFixed(1)}"></div><div class="field num"><label>Duração</label><input type="number" data-xf="dur" step=".1" min=".2" value="${(+e.dur).toFixed(1)}"></div>`}
-      ${d.cat === 'ov' && 'y' in d ? `<div class="field num" style="flex:0 0 130px"><label>Altura</label><input type="range" data-xf="y" min=".12" max=".85" step=".01" value="${e.y}"></div>` : ''}</div>` : ''}</div>`;
+      ${d.global ? '' : `<div class="field num"><label>Início (s)</label><input type="number" data-xf="start" step=".1" min="0" value="${(+e.start).toFixed(1)}"></div><div class="field num"><label>Duração</label><input type="number" data-xf="dur" step=".1" min=".2" value="${(+e.dur).toFixed(1)}"></div>`}</div>` : ''}
+      ${d.cat === 'ov' ? `<div class="row" style="margin-top:4px">
+        <div class="field num" style="flex:0 0 110px"><label>Posição X</label><input type="range" data-xf="x" min="0" max="1" step=".01" value="${e.x ?? .5}"></div>
+        <div class="field num" style="flex:0 0 110px"><label>Posição Y</label><input type="range" data-xf="y" min="0" max="1" step=".01" value="${e.y ?? .4}"></div>
+        <div class="field num" style="flex:0 0 110px"><label>Escala</label><input type="range" data-xf="scale" min=".3" max="2.5" step=".05" value="${e.scale ?? 1}"></div>
+        <div class="field num" style="flex:0 0 110px"><label>Rotação</label><input type="range" data-xf="rot" min="-180" max="180" step="1" value="${e.rot ?? 0}"></div>
+        <div class="field num" style="flex:0 0 110px"><label>Opacidade</label><input type="range" data-xf="opacity" min=".15" max="1" step=".05" value="${e.opacity ?? 1}"></div>
+        <div class="field num" style="flex:0 0 64px"><label>Cor</label><input type="color" data-xf="color" value="${/^#/.test(e.color) ? e.color : (pal().accent)}"></div>
+      </div>` : ''}</div>`;
     }).join('') : '<div class="empty">Ainda nenhuma animação. Escolhe uma em baixo.</div>'}</div></div>
     ${seg('xtab', [['ov', 'Sobreposições'], ['mo', 'Transições']], xTab)}
-    <div class="grid" style="margin-top:14px">${list.map(([k, d], i) => cardHTML('extra', k, d.name, d.desc, i + 1, false, st.extras.some(e => e.type === k) ? 'Usado' : '')).join('')}</div>
-    <p class="note" style="margin-top:20px">Zoom e outros efeitos sobre a própria imagem não aparecem aqui de propósito — esses fazes diretamente no Premiere, sobre o vídeo real. Aqui ficam só as coisas que se <em>sobrepõem</em> ao vídeo, para poderes exportá-las isoladas.</p>`;
+    <div class="box" style="margin-top:14px"><input type="text" id="animSearch" placeholder="Procurar entre os tipos de animação…" value="${esc(animQuery)}"></div>
+    <div class="grid" style="margin-top:14px">${list.length ? list.map(([k, d], i) => cardHTML('extra', k, d.name, d.desc, null, false, st.extras.some(e => e.type === k) ? 'Usado' : '')).join('') : '<div class="empty">Nenhum tipo corresponde à pesquisa.</div>'}</div>
+    <p class="note" style="margin-top:20px">Zoom e outros efeitos sobre a própria imagem não aparecem aqui de propósito — esses fazes diretamente no Premiere, sobre o vídeo real. Aqui ficam só as coisas que se <em>sobrepõem</em> ao vídeo, para poderes exportá-las isoladas e editá-las ao máximo.</p>`;
   } else if (id === 'exportar') {
     const list = exportList();
     const R = RES[st.resolution];
@@ -758,11 +951,14 @@ function bindPanel() {
   if (hstart) hstart.oninput = () => { st.hook.start = Math.max(0, +hstart.value || 0); save(); };
   P.querySelectorAll('[data-xgo]').forEach(b => b.onclick = () => { const e = st.extras.find(x => x.id === b.dataset.xgo); if (vReady) { video.currentTime = Math.max(0, e.start); req(); } });
   P.querySelectorAll('[data-xdel]').forEach(b => b.onclick = () => { st.extras = st.extras.filter(e => e.id !== b.dataset.xdel); save(); renderPanel(); });
+  const NUM_FIELDS = { start: v => Math.max(0, v), dur: v => Math.max(.2, v), x: v => clamp(v, 0, 1), y: v => clamp(v, 0, 1), scale: v => clamp(v, .1, 4), rot: v => clamp(v, -360, 360), opacity: v => clamp(v, 0, 1) };
   P.querySelectorAll('[data-x] [data-xf]').forEach(inp => inp.oninput = () => {
     const e = st.extras.find(x => x.id === inp.closest('[data-x]').dataset.x), k = inp.dataset.xf;
-    e[k] = ['start', 'dur', 'y'].includes(k) ? Math.max(k === 'dur' ? .2 : 0, +inp.value || 0) : inp.value;
+    e[k] = NUM_FIELDS[k] ? NUM_FIELDS[k](+inp.value || 0) : inp.value;
     save(); req(); drawMarks();
   });
+  const animSearch = $('#animSearch');
+  if (animSearch) animSearch.oninput = () => { animQuery = animSearch.value; renderPanel(); setTimeout(() => { const el = $('#animSearch'); if (el) { el.focus(); el.selectionStart = el.selectionEnd = el.value.length; } }, 0); };
   if ($('#expAllBtn')) $('#expAllBtn').onclick = exportAll;
 }
 
@@ -775,8 +971,10 @@ function pick(kind, id) {
     const d = EXTRAS[id];
     if (d.global) { if (st.extras.some(e => e.type === id)) return toast('Já está no vídeo'); st.extras.push(mkExtra(id, 0)); }
     else {
-      let s = vReady ? video.currentTime : 0; if (s < .3) s = .8;
-      if (srcDur && s + d.dur > srcDur) s = Math.max(0, srcDur - d.dur);
+      // Liberdade total: entra exatamente onde o vídeo está neste momento,
+      // sem empurrar para o início nem encurtar perto do fim. Podes sempre
+      // afinar o segundo exato depois, no campo "Início (s)".
+      const s = vReady ? video.currentTime : 0;
       st.extras.push(mkExtra(id, s));
       toast(`${d.name} em ${fmt1(s)}`);
     }
@@ -785,7 +983,11 @@ function pick(kind, id) {
 }
 function mkExtra(type, start) {
   const d = EXTRAS[type];
-  return { id: uid(), type, start: +Math.max(0, start).toFixed(2), dur: d.global ? (srcDur || 10) : d.dur, text: d.text || '', text2: d.text2 || '', y: d.y ?? .4 };
+  return {
+    id: uid(), type, kind: d.kind, start: +Math.max(0, start).toFixed(2),
+    dur: d.global ? (srcDur || 10) : d.dur, text: d.text || '', text2: d.text2 || '',
+    x: d.x ?? .5, y: d.y ?? .4, scale: 1, rot: 0, opacity: 1, color: d.color || '',
+  };
 }
 function lookState(L) { return { ...st, palette: L.palette, font: L.font, hook: { ...st.hook, on: true, style: L.hook } }; }
 function applyLook(L) { Object.assign(st, { palette: L.palette, font: L.font, hook: { ...st.hook, on: true, style: L.hook }, look: L.id }); }
