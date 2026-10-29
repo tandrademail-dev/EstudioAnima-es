@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Estúdio de Animações</title>
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Caveat:wght@600;700&family=DM+Sans:wght@500;700;800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;800;900&family=JetBrains+Mono:wght@500;700&family=Manrope:wght@500;700;800&family=Montserrat:wght@600;800&family=Playfair+Display:wght@700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000;--panel:#0a0a0a;--panel2:#111;--line:#1c1c1c;--line2:#2a2a2a;
+  --text:#fff;--dim:#a3a3a3;--mute:#6b6b6b;--accent:#F7893B;
+  --grad:linear-gradient(90deg,#F7893B,#C13584,#8A3AB9);--r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font:15px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer}
+.topbar{height:3px;background:var(--grad)}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 24px;border-bottom:1px solid var(--line)}
+.brand{font:800 17px Manrope,sans-serif;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.brand .ring{width:22px;height:22px;border-radius:50%;background:var(--grad);position:relative}
+.brand .ring::after{content:"";position:absolute;inset:4px;border-radius:50%;background:#000}
+.brand em{font-style:normal;color:var(--accent)}
+.hint{font:500 11px 'JetBrains Mono',monospace;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+.app{display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:32px;padding:24px;max-width:1440px;margin:0 auto}
+.stage{position:sticky;top:20px;align-self:start}
+.phone{position:relative;height:min(68vh,720px);aspect-ratio:9/16;margin:0 auto;border-radius:22px;overflow:hidden;background:#0d0d0d;border:1px solid var(--line2)}
+.phone.alpha{background-image:linear-gradient(45deg,#1d1d1d 25%,transparent 25%),linear-gradient(-45deg,#1d1d1d 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1d1d1d 75%),linear-gradient(-45deg,transparent 75%,#1d1d1d 75%);background-size:22px 22px;background-position:0 0,0 11px,11px -11px,-11px 0;background-color:#050505}
+.phone canvas{width:100%;height:100%;display:block}
+.phone .busy{position:absolute;inset:0;background:rgba(0,0,0,.72);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}
+.phone .busy.on{display:flex}
+.bar{width:80%;height:6px;border-radius:9px;background:#222;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--grad);transition:width .2s}
+.controls{display:flex;align-items:center;gap:10px;margin:12px auto 0;max-width:min(100%,calc(min(68vh,720px)*9/16 + 80px))}
+.iconbtn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line2);background:var(--panel2);display:grid;place-items:center;flex:none}
+.iconbtn svg{width:16px;height:16px;fill:#fff}
+.time{font:500 12px 'JetBrains Mono',monospace;color:var(--dim);white-space:nowrap}
+.scrub{position:relative;flex:1;height:38px;display:flex;align-items:center}
+.scrub input{width:100%;margin:0;position:relative;z-index:2;background:transparent}
+.marks{position:absolute;left:0;right:0;top:50%;height:16px;transform:translateY(-50%);pointer-events:none;z-index:1}
+.marks i{position:absolute;top:0;height:100%;background:rgba(247,137,59,.35);border-left:2px solid var(--accent);border-radius:2px}
+input[type=range]{accent-color:var(--accent)}
+.subctl{display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.chip{font:500 12px Inter;padding:7px 12px;border-radius:999px;border:1px solid var(--line2);background:var(--panel2);color:var(--dim)}
+.chip:hover{color:#fff}
+main{min-width:0;display:flex;flex-direction:column;min-height:calc(100vh - 120px)}
+.tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tab{font:500 12px 'JetBrains Mono',monospace;padding:11px 12px;color:var(--mute);border:0;background:none;border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:var(--dim)}
+.tab.on{color:#fff;border-bottom-color:var(--accent)}
+.tab.done::after{content:" ✓";color:var(--accent)}
+.panel{flex:1;padding:22px 0 30px}
+.panel h2{font:800 28px/1.15 Manrope,sans-serif;letter-spacing:-.02em;margin:0 0 6px}
+.panel h2 em{font-style:normal;color:var(--accent)}
+.lead{color:var(--dim);margin:0 0 20px;max-width:640px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px}
+.grid.wide{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.card{position:relative;background:var(--panel2);border:1px solid var(--line2);border-radius:var(--r);padding:8px;text-align:left;transition:border-color .15s,transform .15s}
+.card:hover{border-color:#444;transform:translateY(-2px)}
+.card.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.card canvas{width:100%;aspect-ratio:9/16;border-radius:9px;display:block;background:#000}
+.card .n{position:absolute;top:14px;left:14px;font:700 11px 'JetBrains Mono';background:rgba(0,0,0,.65);border-radius:6px;padding:2px 7px}
+.card .tag{position:absolute;top:14px;right:14px;font:700 10px 'JetBrains Mono';background:var(--accent);color:#111;border-radius:6px;padding:2px 7px;text-transform:uppercase}
+.meta{padding:9px 4px 3px}
+.meta b{display:block;font:700 14px Manrope,sans-serif}
+.meta span{display:block;font-size:12px;color:var(--dim);line-height:1.4}
+.big{display:flex;flex-direction:column;justify-content:center;gap:6px;min-height:150px;padding:22px;background:var(--panel2);border:1px solid var(--line2);border-radius:var(--r);text-align:left}
+.big b{font:800 19px Manrope}
+.big span{color:var(--dim);font-size:14px}
+.big.feat{border-color:var(--accent);background:linear-gradient(180deg,rgba(247,137,59,.09),transparent)}
+.drop{border:1.5px dashed #333;border-radius:18px;padding:48px 24px;text-align:center;background:var(--panel);transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent);background:rgba(247,137,59,.06)}
+.drop b{display:block;font:800 20px Manrope;margin-bottom:4px}
+.drop span{color:var(--dim);font-size:14px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin:0 0 20px}
+.box h3{font:700 15px Manrope;margin:0 0 12px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:160px}
+.field label,.lbl{font:500 11px 'JetBrains Mono',monospace;color:var(--mute);text-transform:uppercase;letter-spacing:.05em}
+input[type=text],input[type=number],textarea,select{width:100%;font:500 14px Inter;color:#fff;background:#0f0f0f;border:1px solid var(--line2);border-radius:10px;padding:10px 12px;outline:none}
+input[type=text]:focus,input[type=number]:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:44px}
+.seg{display:inline-flex;border:1px solid var(--line2);border-radius:999px;padding:3px;background:#0f0f0f}
+.seg button{border:0;background:none;padding:7px 14px;border-radius:999px;font:600 13px Inter;color:var(--dim)}
+.seg button.on{background:#fff;color:#000}
+.btn{font:600 14px Inter;padding:11px 18px;border-radius:999px;border:1px solid var(--line2);background:var(--panel2);color:#fff;white-space:nowrap}
+.btn:hover{border-color:#555}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#111}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.sm{padding:7px 12px;font-size:13px}
+.navbar{position:sticky;bottom:0;display:flex;align-items:center;gap:10px;padding:16px 0;background:linear-gradient(180deg,rgba(0,0,0,0),#000 35%);z-index:5}
+.navbar .step{flex:1;text-align:center;font:500 12px 'JetBrains Mono';color:var(--mute)}
+.xlist{display:flex;flex-direction:column;gap:10px}
+.xitem{background:var(--panel2);border:1px solid var(--line2);border-radius:12px;padding:12px}
+.xitem .hd{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.xitem .hd b{font:700 14px Manrope;flex:1}
+.xitem .row .field{min-width:110px}
+.xitem .field.num{flex:0 0 96px;min-width:96px}
+.empty{color:var(--mute);font-size:14px;padding:6px 0}
+.note{font-size:13px;color:var(--dim);background:#0d0d0d;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:10px 12px;margin:0 0 16px}
+.sum{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:0 0 20px}
+.sum div{background:var(--panel2);border:1px solid var(--line2);border-radius:12px;padding:12px}
+.sum b{display:block;font:700 15px Manrope;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.explist{display:flex;flex-direction:column;gap:8px}
+.expitem{display:flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--line2);border-radius:12px;padding:10px 14px}
+.expitem .nm{flex:1;min-width:0}
+.expitem .nm b{display:block;font:700 13px 'JetBrains Mono';overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.expitem .nm span{display:block;font-size:12px;color:var(--dim)}
+.expitem .st{font:600 12px Inter;color:var(--mute);min-width:70px;text-align:right}
+.expitem.done .st{color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);opacity:0;background:#fff;color:#000;font:600 14px Inter;padding:10px 16px;border-radius:999px;transition:.25s;z-index:50;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.sw{display:flex;gap:4px;margin-top:6px}
+.sw i{width:16px;height:16px;border-radius:50%;border:1px solid rgba(255,255,255,.2)}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.tags span{font:500 10px 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em;color:var(--dim);border:1px solid var(--line2);border-radius:6px;padding:1px 6px}
+.hidden{display:none!important}
+#vid{position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0}
+@media (max-width:900px){
+  header{padding:12px 14px}
+  .app{grid-template-columns:1fr;padding:12px 12px 100px;gap:12px}
+  .stage{position:static}
+  .phone{height:50vh;border-radius:16px}
+  .navbar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#000;border-top:1px solid var(--line)}
+  .navbar .step{display:none}
+  .navbar .btn{flex:1;padding:12px 10px}
+  .panel h2{font-size:23px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+  .hint{display:none}
+}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <div class="brand"><span class="ring"></span>Estúdio de <em>Animações</em></div>
+  <div class="hint" id="hdrHint">Tudo corre no teu navegador · o vídeo não sai do teu computador</div>
+</header>
+
+<div class="app">
+  <section class="stage">
+    <div class="phone" id="phoneBox">
+      <canvas id="pv" width="720" height="1280"></canvas>
+      <div class="busy" id="busy"><div id="busyMsg" style="font:700 16px Manrope">A exportar…</div><div class="bar"><i id="busyBar"></i></div><div class="time" id="busySub"></div><button class="btn sm" id="busyCancel">Cancelar</button></div>
+    </div>
+    <div class="controls">
+      <button class="iconbtn" id="playBtn" aria-label="Reproduzir"><svg viewBox="0 0 16 16" id="playIco"><path d="M4 2.5v11l9-5.5z"/></svg></button>
+      <div class="scrub"><div class="marks" id="marks"></div><input type="range" id="scrub" min="0" max="10" step="0.01" value="0" aria-label="Posição"></div>
+      <span class="time" id="timeLbl">0:00 / 0:00</span>
+    </div>
+    <div class="subctl">
+      <button class="chip" id="quickBtn">▶ Ver do início</button>
+      <button class="chip" id="swapBtn">Trocar vídeo</button>
+    </div>
+  </section>
+
+  <main>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="panel" id="panel"></div>
+    <div class="navbar">
+      <button class="btn" id="backBtn">Voltar</button>
+      <span class="step" id="stepLbl"></span>
+      <button class="btn pri" id="nextBtn">Seguinte</button>
+    </div>
+  </main>
+</div>
+
+<video id="vid" playsinline preload="auto"></video>
+<input type="file" id="file" accept="video/*" class="hidden">
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* =========================================================
+   Estúdio de Animações — só animações, overlays e transições.
+   Os cortes fazes tu no Premiere. Aqui: carregas o vídeo (ou
+   já cortado, serve na mesma — qualquer resolução, incl. 4K)
+   só para teres referência visual de onde cada animação cai;
+   colocas as animações na timeline; no fim cada animação é
+   exportada como o seu PRÓPRIO clip WebM com fundo transparente
+   (alpha), com o nome a indicar o segundo do vídeo onde entra,
+   pronta a arrastar para cima da tua timeline já editada.
+   ========================================================= */
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const eOut = t => 1 - Math.pow(1 - clamp(t), 3);
+const eBack = t => { t = clamp(t); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const fmt = s => { s = Math.max(0, s || 0); const m = Math.floor(s / 60), r = Math.floor(s % 60); return m + ':' + String(r).padStart(2, '0'); };
+const fmt1 = s => { s = Math.max(0, s || 0); const m = Math.floor(s / 60); return m + ':' + (s % 60).toFixed(1).padStart(4, '0'); };
+const uid = () => Math.random().toString(36).slice(2, 9);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cap1 = s => s ? s[0].toLocaleUpperCase('pt-PT') + s.slice(1) : s;
+const padSec = s => String(Math.max(0, s || 0).toFixed(1)).padStart(5, '0');
+const slug = s => String(s || '').toLocaleLowerCase('pt-PT').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 24);
+
+/* ---------------- Biblioteca de estilos ---------------- */
+const PALETTES = [
+  { id: 'limao', name: 'Limão', desc: 'Amarelo vivo, contraste máximo', text: '#FFFFFF', accent: '#F4D23C', ink: '#111111', card: '#F4D23C', cardInk: '#111111' },
+  { id: 'noite', name: 'Laranja', desc: 'Quente e confiante', text: '#FFFFFF', accent: '#F7893B', ink: '#111111', card: '#F7893B', cardInk: '#111111' },
+  { id: 'neon', name: 'Néon', desc: 'Energia, ideal para dicas rápidas', text: '#FFFFFF', accent: '#C6FF3D', ink: '#0B0B0B', card: '#C6FF3D', cardInk: '#0B0B0B' },
+  { id: 'ardosia', name: 'Céu', desc: 'Calmo, técnico, credível', text: '#FFFFFF', accent: '#7DD3FC', ink: '#06202D', card: '#E8F6FE', cardInk: '#06202D' },
+  { id: 'papel', name: 'Papel', desc: 'Editorial, tons de creme', text: '#FFFFFF', accent: '#FF7A45', ink: '#1A1A1A', card: '#F3EDE2', cardInk: '#1A1A1A' },
+  { id: 'coral', name: 'Coral', desc: 'Próximo e humano', text: '#FFFFFF', accent: '#FF6B81', ink: '#1A0008', card: '#FF6B81', cardInk: '#1A0008' },
+];
+const FONTS = [
+  { id: 'impacto', name: 'Impacto', desc: 'Condensada, estilo criador', d: { f: 'Anton', w: 400 }, b: { f: 'Inter', w: 900 }, upper: true },
+  { id: 'editorial', name: 'Editorial', desc: 'Serifa elegante + sans', d: { f: 'Instrument Serif', w: 400, s: 'italic' }, b: { f: 'Inter', w: 800 }, upper: false },
+  { id: 'geometrica', name: 'Geométrica', desc: 'Sólida e moderna', d: { f: 'Archivo Black', w: 400 }, b: { f: 'DM Sans', w: 800 }, upper: false },
+  { id: 'poster', name: 'Cartaz', desc: 'Alta, em maiúsculas', d: { f: 'Bebas Neue', w: 400 }, b: { f: 'Montserrat', w: 800 }, upper: true },
+  { id: 'tecnica', name: 'Técnica', desc: 'Para tech e números', d: { f: 'Space Grotesk', w: 700 }, b: { f: 'Space Grotesk', w: 700 }, upper: false },
+  { id: 'classica', name: 'Clássica', desc: 'Serifa forte, premium', d: { f: 'Playfair Display', w: 800 }, b: { f: 'Manrope', w: 800 }, upper: false },
+];
+const HOOK_STYLES = [
+  { id: 'duo', name: 'Duas cores', desc: 'Primeira linha a branco, segunda na cor' },
+  { id: 'caixa', name: 'Caixa', desc: 'Primeira linha num bloco de cor' },
+  { id: 'sublinhado', name: 'Sublinhado', desc: 'Traço de cor animado' },
+  { id: 'etiqueta', name: 'Etiqueta', desc: 'Pequeno rótulo + título grande' },
+];
+// Apenas sobreposições que fazem sentido como clip isolado e transparente.
+// (zoom na imagem ficou de fora de propósito — isso fazes tu no Premiere,
+// sobre o vídeo real; aqui exportamos só o que se SOBREPÕE ao vídeo.)
+const EXTRAS = {
+  numero:     { cat: 'ov', name: 'Número grande', desc: 'Conta até ao valor indicado', dur: 2.4, y: .36, text: '4.258€', text2: 'faturados num mês', f: [['text', 'Número'], ['text2', 'Legenda']] },
+  riscado:    { cat: 'ov', name: 'Palavra riscada', desc: 'Risca uma ideia e mostra a certa', dur: 2.4, y: .4, text: 'mais horas', text2: 'melhor sistema', f: [['text', 'Riscar'], ['text2', 'Substituir por']] },
+  lista:      { cat: 'ov', name: 'Lista', desc: 'Itens a aparecer com visto', dur: 3.2, y: .36, text: 'Orçamento claro|Prazo cumprido|Zero surpresas', f: [['text', 'Itens (separa com |)']] },
+  cartao:     { cat: 'ov', name: 'Cartão de cor', desc: 'Frase forte num bloco de cor', dur: 1.8, y: .42, text: 'o sonho', f: [['text', 'Texto']] },
+  mensagem:   { cat: 'ov', name: 'Mensagem', desc: 'A escrever… e depois a mensagem', dur: 3, y: .32, text: 'Quando podemos começar?', text2: 'Cliente', f: [['text', 'Mensagem'], ['text2', 'Remetente']] },
+  comentario: { cat: 'ov', name: 'Comentário', desc: 'Pop-up de comentário de um seguidor', dur: 2.8, y: .3, text: 'isto mudou a minha forma de trabalhar 🔥', text2: 'ana.ferreira', f: [['text', 'Comentário'], ['text2', 'Utilizador']] },
+  carimbo:    { cat: 'ov', name: 'Carimbo', desc: 'Uma palavra carimbada no ecrã', dur: 1.5, y: .4, text: 'aprovado', f: [['text', 'Palavra']] },
+  nota:       { cat: 'ov', name: 'Nota manuscrita', desc: 'Um post-it escrito à mão', dur: 2.5, y: .42, text: 'não te esqueças disto', f: [['text', 'Texto']] },
+  emoji:      { cat: 'ov', name: 'Emoji', desc: 'Emoji grande com salto', dur: 1.2, y: .32, text: '🤯', f: [['text', 'Emoji']] },
+  flash:      { cat: 'mo', name: 'Flash', desc: 'Clarão branco — ótimo em "modo adição" numa transição', dur: .45, f: [] },
+  barra:      { cat: 'mo', name: 'Barra de progresso', desc: 'Linha que avança no topo, do início ao fim do vídeo', dur: 0, global: true, f: [] },
+};
+const LOOKS = [
+  { id: 'fundador', name: 'Fundador', desc: 'Direto, amarelo', palette: 'limao', font: 'impacto', hook: 'duo' },
+  { id: 'agencia', name: 'Agência', desc: 'Moderno, laranja', palette: 'noite', font: 'geometrica', hook: 'sublinhado' },
+  { id: 'energia', name: 'Energia', desc: 'Néon, alta energia', palette: 'neon', font: 'poster', hook: 'etiqueta' },
+  { id: 'editorial', name: 'Editorial', desc: 'Serifa, creme, calmo', palette: 'papel', font: 'editorial', hook: 'caixa' },
+  { id: 'premium', name: 'Premium', desc: 'Clássico, frio, credível', palette: 'ardosia', font: 'classica', hook: 'duo' },
+];
+const STEPS = [
+  { id: 'inicio', tab: 'Início' }, { id: 'estilo', tab: '1 Estilo' }, { id: 'hook', tab: '2 Hook' },
+  { id: 'animacoes', tab: '3 Animações' }, { id: 'exportar', tab: '4 Exportar' },
+];
+const RES = { '1080': { w: 1080, h: 1920, name: 'Full HD · 1080×1920' }, '4k': { w: 2160, h: 3840, name: '4K · 2160×3840' } };
+
+/* ---------------- Estado (localStorage) ---------------- */
+const KEY = 'estudio-animacoes:v1';
+const DEFAULT = () => ({
+  v: 1, palette: 'limao', font: 'impacto', look: '',
+  hook: { on: true, l1: 'Ninguém te diz isto', l2: 'sobre crescer um negócio', style: 'duo', pos: 'top', dur: '3', start: 0 },
+  resolution: '1080', extras: [], videoKey: '', videoName: '', done: [],
+});
+function loadState() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return DEFAULT();
+    const s = JSON.parse(raw), d = DEFAULT();
+    return { ...d, ...s, hook: { ...d.hook, ...s.hook } };
+  } catch (e) { return DEFAULT(); }
+}
+let st = loadState();
+let saveT;
+function save() { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }, 250); }
+
+const pal = (s = st) => PALETTES.find(p => p.id === s.palette) || PALETTES[0];
+const fnt = (s = st) => FONTS.find(f => f.id === s.font) || FONTS[0];
+const fs = (o, size) => `${o.s || 'normal'} ${o.w} ${Math.round(size)}px "${o.f}", ${/Serif|Playfair/.test(o.f) ? 'Georgia, serif' : 'Inter, system-ui, sans-serif'}`;
+
+/* ---------------- Vídeo (sem cortes — é só referência) ---------------- */
+const video = $('#vid');
+let vReady = false, srcDur = 0, videoFile = null;
+function duration() { return srcDur; }
+
+/* ---------------- Utilitários de desenho ---------------- */
+function rr(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function wrap(ctx, text, maxW) {
+  const words = String(text).split(/\s+/).filter(Boolean), lines = [];
+  let cur = '';
+  for (const w of words) {
+    const t = cur ? cur + ' ' + w : w;
+    if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t;
+  }
+  if (cur) lines.push(cur);
+  return lines.length ? lines : [''];
+}
+function fitFont(ctx, fo, text, size, maxW, minSize = 30) {
+  let s = size;
+  ctx.font = fs(fo, s);
+  while (s > minSize && ctx.measureText(text).width > maxW) { s -= 4; ctx.font = fs(fo, s); }
+  return s;
+}
+function shadow(ctx, on, blur = 22, a = .5) {
+  ctx.shadowColor = on ? `rgba(0,0,0,${a})` : 'transparent';
+  ctx.shadowBlur = on ? blur : 0; ctx.shadowOffsetY = on ? 4 : 0;
+}
+const caseT = (t, upper) => upper ? String(t).toLocaleUpperCase('pt-PT') : String(t);
+const SANS = 'Inter, system-ui, sans-serif';
+
+/* ---------------- Render de pré-visualização (vídeo + overlays, espaço 1080×1920) ---------------- */
+function render(ctx, W, H, s, t, o = {}) {
+  ctx.save();
+  ctx.clearRect(0, 0, W, H);
+  ctx.setTransform(W / 1080, 0, 0, H / 1920, 0, 0);
+  ctx.textBaseline = 'alphabetic';
+  if (o.withVideo !== false) {
+    drawVideo(ctx, t);
+    const g = ctx.createLinearGradient(0, 0, 0, 1920);
+    g.addColorStop(0, 'rgba(0,0,0,.35)'); g.addColorStop(.22, 'rgba(0,0,0,0)');
+    g.addColorStop(.62, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.4)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1920);
+  }
+  if (o.hook !== false && s.hook.on) drawHook(ctx, s, t - (s.hook.start || 0));
+  const extras = o.extras ?? s.extras;
+  for (const e of extras) if (EXTRAS[e.type]?.cat === 'ov') drawExtra(ctx, s, e, t);
+  for (const e of extras) if (e.type === 'flash') drawFlash(ctx, t - e.start, e.dur);
+  for (const e of extras) if (e.type === 'barra') drawBarra(ctx, s, t, duration() || e.dur || 10);
+  ctx.restore();
+}
+function drawFlash(ctx, lt, dur) {
+  if (lt >= 0 && lt <= dur) { ctx.fillStyle = `rgba(255,255,255,${(1 - lt / dur) * .95})`; ctx.fillRect(0, 0, 1080, 1920); }
+}
+function drawBarra(ctx, s, t, total) {
+  const p = clamp(t / (total || 1));
+  ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(0, 0, 1080, 12);
+  ctx.fillStyle = pal(s).accent; ctx.fillRect(0, 0, 1080 * p, 12);
+}
+function drawVideo(ctx, t) {
+  ctx.save();
+  if (vReady && video.videoWidth) {
+    const vw = video.videoWidth, vh = video.videoHeight;
+    const sc = Math.max(1080 / vw, 1920 / vh), dw = vw * sc, dh = vh * sc;
+    ctx.drawImage(video, (1080 - dw) / 2, (1920 - dh) / 2, dw, dh);
+  } else {
+    const g = ctx.createLinearGradient(0, 0, 1080, 1920);
+    g.addColorStop(0, '#2b2f36'); g.addColorStop(1, '#0d0f12');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1920);
+    ctx.fillStyle = 'rgba(255,255,255,.07)';
+    ctx.beginPath(); ctx.arc(540, 820, 170, 0, Math.PI * 2); ctx.fill();
+    rr(ctx, 260, 1020, 560, 700, 260); ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ---------- Hook ---------- */
+function drawHook(ctx, s, t) {
+  const h = s.hook; if (!h.l1 && !h.l2) return;
+  if (t < -.3) return;
+  const P = pal(s), F = fnt(s);
+  const end = h.dur === 'all' ? Infinity : +h.dur;
+  if (t > end + .3) return;
+  const a = eOut((t - .05) / .45) * (t > end ? 1 - clamp((t - end) / .3) : 1);
+  if (a <= 0) return;
+  const l1 = caseT(h.l1, F.upper), l2 = caseT(h.l2, F.upper);
+  const baseY = h.pos === 'top' ? 250 : 820;
+  ctx.save();
+  ctx.globalAlpha = a; ctx.translate(0, (1 - a) * 40); ctx.textAlign = 'center';
+  const maxW = 940;
+  if (h.style === 'duo') {
+    shadow(ctx, true);
+    const s1 = fitFont(ctx, F.d, l1, 132, maxW); ctx.fillStyle = P.text; ctx.fillText(l1, 540, baseY);
+    if (l2) { const s2 = fitFont(ctx, F.d, l2, s1 * .62, maxW); ctx.fillStyle = P.accent; ctx.fillText(l2, 540, baseY + s2 * 1.12); }
+  } else if (h.style === 'caixa') {
+    const s1 = fitFont(ctx, F.d, l1, 112, maxW - 60);
+    const w = ctx.measureText(l1).width + 64, hh = s1 * 1.32;
+    shadow(ctx, true, 30, .35); ctx.fillStyle = P.card; rr(ctx, 540 - w / 2, baseY - s1 * 1.0, w, hh, 18); ctx.fill(); shadow(ctx, false);
+    ctx.fillStyle = P.cardInk; ctx.fillText(l1, 540, baseY + s1 * .02);
+    if (l2) { shadow(ctx, true); const s2 = fitFont(ctx, F.b, l2, 58, maxW); ctx.fillStyle = P.text; ctx.fillText(l2, 540, baseY + hh * .55 + s2 * 1.1); }
+  } else if (h.style === 'sublinhado') {
+    shadow(ctx, true);
+    const s1 = fitFont(ctx, F.d, l1, 124, maxW); ctx.fillStyle = P.text; ctx.fillText(l1, 540, baseY);
+    if (l2) {
+      const s2 = fitFont(ctx, F.d, l2, s1 * .7, maxW); const y2 = baseY + s2 * 1.18;
+      const w2 = ctx.measureText(l2).width, p = eOut((t - .35) / .5);
+      shadow(ctx, false); ctx.fillStyle = P.accent; rr(ctx, 540 - w2 / 2, y2 + s2 * .14, w2 * p, Math.max(10, s2 * .14), 6); ctx.fill();
+      shadow(ctx, true); ctx.fillStyle = P.text; ctx.fillText(l2, 540, y2);
+    }
+  } else {
+    let y = baseY - 70;
+    if (l2) {
+      ctx.font = fs(F.b, 40); const w = ctx.measureText(l2).width + 46;
+      shadow(ctx, false); ctx.fillStyle = P.accent; rr(ctx, 540 - w / 2, y - 46, w, 66, 33); ctx.fill();
+      ctx.fillStyle = P.ink; ctx.fillText(l2, 540, y);
+      y += 60;
+    }
+    shadow(ctx, true);
+    ctx.font = fs(F.d, 120); const lines = wrap(ctx, l1, maxW).slice(0, 2);
+    lines.forEach((ln, i) => { const sz = fitFont(ctx, F.d, ln, 120, maxW); ctx.fillStyle = P.text; ctx.fillText(ln, 540, y + sz * (i + 1)); });
+  }
+  ctx.restore();
+}
+
+/* ---------- Extras (sobreposições/overlays) ---------- */
+function drawExtra(ctx, s, e, t) {
+  const lt = t - e.start; if (lt < 0 || lt > e.dur) return;
+  const P = pal(s), F = fnt(s);
+  const inA = eOut(lt / .3), out = clamp((e.dur - lt) / .25), A = Math.min(inA, out);
+  const Y = (e.y ?? .4) * 1920;
+  ctx.save(); ctx.globalAlpha = A; ctx.textAlign = 'center';
+  switch (e.type) {
+    case 'nota': {
+      ctx.font = '700 72px Caveat, cursive'; const lines = wrap(ctx, e.text, 560).slice(0, 4);
+      const w = 660, h = 110 + lines.length * 78;
+      ctx.translate(540, Y); ctx.rotate(-.06 + (1 - eBack(lt / .4)) * .1); ctx.scale(.9 + .1 * eBack(lt / .35), .9 + .1 * eBack(lt / .35));
+      shadow(ctx, true, 30, .4); ctx.fillStyle = '#FFF4C7'; ctx.fillRect(-w / 2, -h / 2, w, h); shadow(ctx, false);
+      ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillRect(-70, -h / 2 - 22, 140, 44);
+      const rev = clamp((lt - .15) / .9);
+      ctx.save(); ctx.beginPath(); ctx.rect(-w / 2, -h / 2, w * rev, h); ctx.clip();
+      ctx.fillStyle = '#1d2a5c'; lines.forEach((l, i) => ctx.fillText(l, 0, -h / 2 + 100 + i * 78));
+      ctx.restore(); break;
+    }
+    case 'cartao': {
+      const T = caseT(e.text, F.upper); ctx.font = fs(F.d, 110); const lines = wrap(ctx, T, 700).slice(0, 3);
+      const sz = Math.min(110, ...lines.map(l => fitFont(ctx, F.d, l, 110, 700)));
+      const w = 820, h = 150 + lines.length * sz * 1.08;
+      const yy = Y + (1 - eOut(lt / .35)) * 120;
+      shadow(ctx, true, 40, .35); ctx.fillStyle = P.card; rr(ctx, 540 - w / 2, yy - h / 2, w, h, 26); ctx.fill(); shadow(ctx, false);
+      ctx.fillStyle = P.cardInk; ctx.font = fs(F.d, sz);
+      lines.forEach((l, i) => ctx.fillText(l, 540, yy - h / 2 + 75 + sz * .8 + i * sz * 1.08)); break;
+    }
+    case 'carimbo': {
+      const T = String(e.text).toLocaleUpperCase('pt-PT');
+      const sz = fitFont(ctx, F.d, T, 120, 760); const w = ctx.measureText(T).width + 80, h = sz * 1.45;
+      const sc = 1 + .9 * (1 - eOut(lt / .22));
+      ctx.translate(540, Y); ctx.rotate(-.14); ctx.scale(sc, sc);
+      ctx.globalAlpha = A * .95; ctx.strokeStyle = P.accent; ctx.lineWidth = 12; rr(ctx, -w / 2, -h / 2, w, h, 14); ctx.stroke();
+      ctx.lineWidth = 4; rr(ctx, -w / 2 + 16, -h / 2 + 16, w - 32, h - 32, 8); ctx.stroke();
+      ctx.fillStyle = P.accent; ctx.textBaseline = 'middle'; ctx.fillText(T, 0, 6); break;
+    }
+    case 'numero': {
+      const raw = String(e.text); const m = raw.match(/\d[\d.,\s]*/);
+      let shown = raw;
+      if (m) {
+        const digits = m[0].replace(/[^\d]/g, ''), target = parseInt(digits, 10) || 0;
+        const hasSep = /[.\s]\d{3}/.test(m[0]);
+        const cur = Math.round(target * eOut(lt / 1.1));
+        const curStr = hasSep ? String(cur).replace(/\B(?=(\d{3})+(?!\d))/g, '.') : String(cur);
+        shown = raw.slice(0, m.index) + curStr + raw.slice(m.index + m[0].trimEnd().length);
+      }
+      shadow(ctx, true, 30, .5);
+      fitFont(ctx, F.d, raw, 250, 960); ctx.fillStyle = P.accent; ctx.fillText(shown, 540, Y);
+      if (e.text2) { const s2 = fitFont(ctx, F.b, e.text2, 54, 900); ctx.fillStyle = P.text; ctx.fillText(e.text2, 540, Y + s2 * 1.5); }
+      break;
+    }
+    case 'comentario': {
+      ctx.font = `500 44px ${SANS}`; const lines = wrap(ctx, e.text, 640).slice(0, 4);
+      const w = 860, h = 150 + lines.length * 58, sc = .7 + .3 * eBack(lt / .3);
+      ctx.translate(540, Y); ctx.scale(sc, sc);
+      shadow(ctx, true, 40, .35); ctx.fillStyle = '#fff'; rr(ctx, -w / 2, -h / 2, w, h, 36); ctx.fill(); shadow(ctx, false);
+      const ax = -w / 2 + 70, ay = -h / 2 + 72;
+      ctx.fillStyle = P.accent; ctx.beginPath(); ctx.arc(ax, ay, 38, 0, 7); ctx.fill();
+      ctx.fillStyle = P.ink; ctx.font = `800 36px ${SANS}`; ctx.textBaseline = 'middle'; ctx.fillText((e.text2 || '?')[0].toUpperCase(), ax, ay + 2);
+      ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+      ctx.fillStyle = '#111'; ctx.font = `700 36px ${SANS}`; ctx.fillText(e.text2 || 'utilizador', ax + 58, ay - 4);
+      ctx.fillStyle = '#8a8a8a'; ctx.font = `500 28px ${SANS}`; ctx.fillText('agora', ax + 58, ay + 32);
+      ctx.fillStyle = '#222'; ctx.font = `500 44px ${SANS}`; lines.forEach((l, i) => ctx.fillText(l, -w / 2 + 42, -h / 2 + 170 + i * 58));
+      ctx.fillStyle = '#ff3b5c'; ctx.font = `40px ${SANS}`; ctx.textAlign = 'right'; ctx.fillText('♥', w / 2 - 40, -h / 2 + 84); break;
+    }
+    case 'mensagem': {
+      const typing = lt < .9;
+      ctx.font = `500 46px ${SANS}`; const lines = typing ? [''] : wrap(ctx, e.text, 620).slice(0, 4);
+      const tw = typing ? 150 : Math.max(...lines.map(l => ctx.measureText(l).width)) + 76;
+      const h = typing ? 100 : 46 + lines.length * 60, x = 110, sc = .8 + .2 * eBack(lt / .25);
+      ctx.translate(x, Y); ctx.scale(sc, sc); ctx.textAlign = 'left';
+      if (e.text2) { shadow(ctx, true, 12, .6); ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.font = `600 30px ${SANS}`; ctx.fillText(e.text2, 20, -h / 2 - 18); shadow(ctx, false); }
+      shadow(ctx, true, 30, .3); ctx.fillStyle = '#ECECEE'; rr(ctx, 0, -h / 2, tw, h, 40); ctx.fill(); shadow(ctx, false);
+      if (typing) { for (let i = 0; i < 3; i++) { const b = Math.sin(lt * 10 - i * .8) * .5 + .5; ctx.fillStyle = `rgba(80,80,90,${.35 + b * .5})`; ctx.beginPath(); ctx.arc(42 + i * 34, -b * 8, 11, 0, 7); ctx.fill(); } }
+      else { ctx.fillStyle = '#111'; ctx.font = `500 46px ${SANS}`; lines.forEach((l, i) => ctx.fillText(l, 38, -h / 2 + 64 + i * 60)); }
+      break;
+    }
+    case 'riscado': {
+      shadow(ctx, true);
+      const T1 = caseT(e.text, F.upper), sz = fitFont(ctx, F.d, T1, 120, 900), w = ctx.measureText(T1).width;
+      ctx.fillStyle = P.text; ctx.globalAlpha = A * (lt > .7 ? .55 : 1); ctx.fillText(T1, 540, Y);
+      const p = eOut((lt - .3) / .4); shadow(ctx, false); ctx.globalAlpha = A;
+      ctx.fillStyle = P.accent; rr(ctx, 540 - w / 2 - 10, Y - sz * .38, (w + 20) * p, Math.max(10, sz * .11), 6); ctx.fill();
+      const t2 = e.t2 ?? .75;
+      if (e.text2 && lt > t2) {
+        const T2 = caseT(e.text2, F.upper); const s2 = fitFont(ctx, F.d, T2, 120, 900); const sc = eBack((lt - t2) / .25);
+        ctx.save(); ctx.translate(540, Y + s2 * 1.25); ctx.scale(sc, sc); shadow(ctx, true); ctx.fillStyle = P.accent; ctx.fillText(T2, 0, 0); ctx.restore();
+      }
+      break;
+    }
+    case 'lista': {
+      const items = String(e.text).split(/\||\n/).map(x => x.trim()).filter(Boolean).slice(0, 6);
+      const w = 860, h = 70 + items.length * 96;
+      ctx.fillStyle = 'rgba(8,8,8,.78)'; rr(ctx, 540 - w / 2, Y - h / 2, w, h, 30); ctx.fill();
+      ctx.textAlign = 'left';
+      items.forEach((it, i) => {
+        const at = (e.at && e.at[i] != null) ? e.at[i] : .2 + i * .45;
+        const p = eOut((lt - at) / .3); if (p <= 0) return;
+        const yy = Y - h / 2 + 82 + i * 96; ctx.save(); ctx.globalAlpha = A * p; ctx.translate((1 - p) * 30, 0);
+        ctx.fillStyle = P.accent; rr(ctx, 540 - w / 2 + 44, yy - 40, 54, 54, 14); ctx.fill();
+        ctx.strokeStyle = P.ink; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.beginPath();
+        ctx.moveTo(540 - w / 2 + 58, yy - 13); ctx.lineTo(540 - w / 2 + 68, yy - 2); ctx.lineTo(540 - w / 2 + 86, yy - 26); ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.font = fs(F.b, fitFont(ctx, F.b, it, 50, 660)); ctx.fillText(it, 540 - w / 2 + 128, yy);
+        ctx.restore();
+      });
+      break;
+    }
+    case 'emoji': {
+      const sc = eBack(lt / .35), rot = Math.sin(lt * 8) * .08 * (1 - clamp(lt / 1));
+      ctx.translate(540, Y); ctx.rotate(rot); ctx.scale(sc, sc);
+      ctx.font = '230px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; ctx.textBaseline = 'middle';
+      ctx.fillText(e.text, 0, 0); break;
+    }
+  }
+  ctx.restore();
+}
+
+/* =========================================================
+   Pré-visualização (vídeo real como referência + overlays)
+   ========================================================= */
+const pv = $('#pv'), pctx = pv.getContext('2d');
+let playing = false, exporting = false, dirty = true;
+function drawPreview() {
+  if (exporting) return;
+  const T = vReady ? video.currentTime : 0;
+  render(pctx, pv.width, pv.height, st, T, {});
+  $('#scrub').value = T;
+  $('#timeLbl').textContent = `${fmt(T)} / ${fmt(srcDur)}`;
+}
+function loop() {
+  if (playing || !vReady || dirty) { drawPreview(); dirty = false; }
+  animateCard();
+  requestAnimationFrame(loop);
+}
+const req = () => { dirty = true; };
+
+function setPlayIcon() { $('#playIco').innerHTML = playing ? '<path d="M4 2h3v12H4zM9 2h3v12H9z"/>' : '<path d="M4 2.5v11l9-5.5z"/>'; }
+$('#playBtn').onclick = async () => {
+  if (!vReady) { toast('Carrega primeiro um vídeo'); return; }
+  if (video.paused) { if (video.currentTime >= srcDur - .08) video.currentTime = 0; await video.play().catch(() => {}); }
+  else video.pause();
+};
+video.addEventListener('play', () => { playing = true; setPlayIcon(); });
+video.addEventListener('pause', () => { playing = false; setPlayIcon(); req(); });
+video.addEventListener('ended', () => { playing = false; setPlayIcon(); req(); });
+video.addEventListener('seeked', () => { req(); refreshCards(); });
+video.addEventListener('timeupdate', () => { if (playing) req(); });
+$('#scrub').addEventListener('input', e => { if (!vReady) return; video.currentTime = +e.target.value; req(); });
+$('#quickBtn').onclick = () => { if (!vReady) return toast('Carrega primeiro um vídeo'); video.currentTime = 0; video.play().catch(() => {}); };
+$('#swapBtn').onclick = () => $('#file').click();
+
+function drawMarks() {
+  const d = srcDur || 10;
+  $('#marks').innerHTML = st.extras.filter(e => !EXTRAS[e.type]?.global).map(e =>
+    `<i style="left:${(e.start / d) * 100}%;width:${Math.max(.8, (e.dur / d) * 100)}%"></i>`).join('');
+}
+
+/* ---------------- Carregar vídeo ---------------- */
+$('#file').addEventListener('change', e => { const f = e.target.files[0]; if (f) loadVideo(f); e.target.value = ''; });
+function loadVideo(f) {
+  if (!f.type.startsWith('video/') && !/\.(mp4|mov|webm|m4v)$/i.test(f.name)) return toast('Esse ficheiro não parece ser um vídeo');
+  videoFile = f; vReady = false; st.videoName = f.name;
+  const key = f.name + ':' + f.size;
+  st.videoKey = key; save();
+  if (video.src) URL.revokeObjectURL(video.src);
+  video.src = URL.createObjectURL(f);
+  video.load();
+}
+video.addEventListener('loadedmetadata', () => { srcDur = video.duration || 0; $('#scrub').max = srcDur; drawMarks(); });
+video.addEventListener('loadeddata', () => {
+  vReady = true;
+  const isVert = video.videoHeight > video.videoWidth;
+  const longSide = Math.max(video.videoWidth, video.videoHeight);
+  const auto4k = longSide >= 3200 ? '4k' : '1080';
+  if (!st.resTouched) { st.resolution = auto4k; save(); }
+  if (longSide >= 3200) toast(`Vídeo 4K detetado (${video.videoWidth}×${video.videoHeight}) — exportação já pré-definida para 4K`);
+  else if (video.videoHeight && !isVert) toast('Dica: o vídeo não é vertical — vai ser recortado ao centro para 9:16 na pré-visualização');
+  renderPanel(); req();
+});
+video.addEventListener('error', () => toast('O navegador não conseguiu ler este vídeo. Experimenta um ficheiro MP4 (H.264) ou MOV.'));
+
+/* ---------------- Miniaturas (cartões) ---------------- */
+function cardSpec(kind, id) {
+  switch (kind) {
+    case 'palette': return { s: { ...st, palette: id, hook: { ...st.hook, on: true, dur: 'all' } }, o: { withVideo: false, extras: [] }, t: 1.2, loop: 2.4 };
+    case 'font': return { s: { ...st, font: id, hook: { ...st.hook, on: true, dur: 'all' } }, o: { withVideo: false, extras: [] }, t: 1.2, loop: 2.4 };
+    case 'hook': return { s: { ...st, hook: { ...st.hook, style: id, on: true, dur: 'all' } }, o: { withVideo: false, extras: [] }, t: 1.2, loop: 2.2 };
+    case 'extra': {
+      const d = EXTRAS[id]; const e = mkExtra(id, 0); if (d.global) e.dur = 10;
+      return { s: st, o: { withVideo: false, hook: false, extras: [e] }, t: d.global ? 6 : (id === 'flash' ? .08 : Math.min(d.dur * .7, 1.4)), loop: Math.max(1, d.dur) + .5 };
+    }
+    case 'look': { const L = LOOKS.find(l => l.id === id); return { s: lookState(L), o: { withVideo: false, extras: [] }, t: 1.2, loop: 2.4 }; }
+  }
+}
+function drawCard(cv, tOverride) {
+  const sp = cardSpec(cv.dataset.kind, cv.dataset.id); if (!sp) return;
+  const t = tOverride != null ? tOverride : sp.t;
+  render(cv.getContext('2d'), cv.width, cv.height, sp.s, t, sp.o);
+}
+function refreshCards() { $$('#panel canvas[data-kind]').forEach(cv => drawCard(cv)); }
+let hoverCard = null, hoverStart = 0;
+function animateCard() {
+  if (!hoverCard || !hoverCard.isConnected || exporting) return;
+  const sp = cardSpec(hoverCard.dataset.kind, hoverCard.dataset.id);
+  drawCard(hoverCard, ((performance.now() - hoverStart) / 1000) % sp.loop);
+}
+document.addEventListener('pointerover', e => {
+  const card = e.target.closest?.('.card'); const cv = card?.querySelector('canvas[data-kind]');
+  if (cv && cv !== hoverCard) { if (hoverCard?.isConnected) drawCard(hoverCard); hoverCard = cv; hoverStart = performance.now(); }
+  if (!card && hoverCard) { if (hoverCard.isConnected) drawCard(hoverCard); hoverCard = null; }
+});
+const cardHTML = (kind, id, name, desc, i, sel, tag = '', extra = '') =>
+  `<button class="card${sel ? ' sel' : ''}" data-pick="${kind}" data-id="${id}">
+    <canvas data-kind="${kind}" data-id="${id}" width="216" height="384"></canvas>
+    ${i != null ? `<span class="n">${i}</span>` : ''}${tag ? `<span class="tag">${tag}</span>` : ''}
+    <div class="meta"><b>${esc(name)}</b><span>${esc(desc)}</span>${extra}</div></button>`;
+
+/* ---------------- Assistente por passos ---------------- */
+let step = 0, xTab = 'ov';
+function renderTabs() {
+  $('#tabs').innerHTML = STEPS.map((s, i) =>
+    `<button class="tab${i === step ? ' on' : ''}${st.done.includes(s.id) && i !== step ? ' done' : ''}" data-step="${i}">${s.tab}</button>`).join('');
+  $('#stepLbl').textContent = step === 0 ? 'Início' : `Passo ${step} de 4`;
+  $('#backBtn').disabled = step === 0;
+  $('#nextBtn').textContent = step === 4 ? 'Exportar' : 'Seguinte';
+}
+$('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-step]'); if (b) go(+b.dataset.step); });
+function go(i) {
+  if (i > 0 && !vReady) { toast('Começa por carregar o teu vídeo (ou o já cortado)'); i = 0; }
+  const cur = STEPS[step].id; if (i > step && step > 0 && !st.done.includes(cur)) st.done.push(cur);
+  step = clamp(i, 0, 4); save(); renderPanel(); window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+$('#backBtn').onclick = () => go(step - 1);
+$('#nextBtn').onclick = () => step === 4 ? exportAll() : go(step + 1);
+const seg = (k, opts, cur) => `<div class="seg" data-seg="${k}">${opts.map(([v, l]) => `<button data-v="${v}" class="${String(cur) === String(v) ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+
+function itemFilename(e, i) {
+  const d = EXTRAS[e.type];
+  return `${String(i + 1).padStart(2, '0')}_${padSec(e.start)}s_${e.type}${slug(e.text) ? '-' + slug(e.text) : ''}.webm`;
+}
+function exportList() {
+  const list = [...st.extras];
+  if (st.hook.on && (st.hook.l1 || st.hook.l2)) {
+    const hd = st.hook.dur === 'all' ? Math.min(srcDur || 5, 6) : +st.hook.dur;
+    list.push({ id: '__hook', type: 'hook', start: st.hook.start || 0, dur: hd, text: st.hook.l1 });
+  }
+  return list.sort((a, b) => a.start - b.start);
+}
+
+function renderPanel() {
+  renderTabs();
+  const P = $('#panel'), id = STEPS[step].id;
+  $('#phoneBox').classList.remove('alpha');
+  let h = '';
+  if (id === 'inicio') {
+    if (!vReady) {
+      h = `<h2>Põe <em>animações</em> no teu reel em minutos</h2>
+      <p class="lead">Carrega o vídeo — pode ser o bruto ou já o que já cortaste no Premiere, e pode estar em qualquer resolução, incluindo 4K. Serve só de referência visual para veres onde cada animação cai; os cortes continuas a fazê-los tu.</p>
+      <div class="drop" id="drop"><b>Arrasta o vídeo para aqui</b><span>ou</span><div style="margin-top:14px"><button class="btn pri" id="pickBtn">Escolher vídeo</button></div><div class="hint" style="margin-top:14px;display:block">MP4, MOV ou WEBM · qualquer resolução (incl. 4K) · só como referência</div></div>`;
+    } else {
+      h = `<h2>Vídeo carregado. <em>Vamos estilizar.</em></h2>
+      <p class="lead">Duração: ${fmt(srcDur)}${video.videoWidth ? ` · vídeo de origem ${video.videoWidth}×${video.videoHeight}` : ''}. As animações vão exportar em <b style="color:var(--accent)">${RES[st.resolution].name}</b> — muda isso no último passo se o teu projeto no Premiere usar outro formato. Escolhe um estilo rápido (opcional, podes afinar nos passos seguintes), depois segue para colocar as animações.</p>
+      <div class="grid wide" style="margin-bottom:26px">
+        <button class="big feat" data-start="1"><b>Seguir para o estilo</b><span>Cores, letra, hook e depois as animações sobre a timeline.</span></button>
+      </div>
+      <h3 style="font:700 16px Manrope;margin:0 0 4px">Estilo rápido (opcional)</h3>
+      <div class="grid">${LOOKS.map((L, i) => cardHTML('look', L.id, L.name, L.desc, i + 1, st.look === L.id)).join('')}</div>`;
+    }
+  } else if (id === 'estilo') {
+    h = `<h2>Cores e <em>letra</em></h2><p class="lead">A cor de destaque aparece no hook e nos gráficos. Passa o rato (ou toca) num cartão para o ver animado.</p>
+    <h3 style="font:700 16px Manrope;margin:0 0 12px">Cores</h3>
+    <div class="grid" style="margin-bottom:26px">${PALETTES.map((p, i) => cardHTML('palette', p.id, p.name, p.desc, i + 1, st.palette === p.id, '', `<div class="sw"><i style="background:${p.accent}"></i><i style="background:${p.card}"></i><i style="background:${p.text}"></i></div>`)).join('')}</div>
+    <h3 style="font:700 16px Manrope;margin:0 0 12px">Letra</h3>
+    <div class="grid">${FONTS.map((f, i) => cardHTML('font', f.id, f.name, f.desc, i + 1, st.font === f.id)).join('')}</div>`;
+  } else if (id === 'hook') {
+    const H = st.hook;
+    h = `<h2>O teu <em>hook</em></h2><p class="lead">O título que prende nos primeiros segundos. É exportado como o seu próprio clip transparente, à parte das outras animações.</p>
+    <div class="box"><div class="row">
+      <div class="field" style="flex:0 0 auto"><span class="lbl">Incluir hook</span>${seg('hookon', [[1, 'Sim'], [0, 'Não']], H.on ? 1 : 0)}</div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <div class="field"><label>Linha 1</label><input type="text" id="h1" value="${esc(H.l1)}" maxlength="60" placeholder="Ex.: Despediste-te?"></div>
+      <div class="field"><label>Linha 2</label><input type="text" id="h2" value="${esc(H.l2)}" maxlength="60" placeholder="Ex.: a parte que ninguém conta"></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <div class="field" style="flex:0 0 auto"><span class="lbl">Posição</span>${seg('pos', [['top', 'Topo'], ['middle', 'Centro']], H.pos)}</div>
+      <div class="field" style="flex:0 0 auto"><span class="lbl">Fica visível</span>${seg('dur', [['3', '3 s'], ['5', '5 s'], ['all', 'Todo o vídeo']], H.dur)}</div>
+      <div class="field num" style="flex:0 0 140px"><label>Entra ao segundo</label><input type="number" id="hstart" min="0" step=".1" value="${(+H.start || 0).toFixed(1)}"></div>
+    </div></div>
+    <div class="grid">${HOOK_STYLES.map((s, i) => cardHTML('hook', s.id, s.name, s.desc, i + 1, H.style === s.id)).join('')}</div>`;
+  } else if (id === 'animacoes') {
+    const list = Object.entries(EXTRAS).filter(([, d]) => d.cat === xTab);
+    h = `<h2>Animações na <em>timeline</em></h2><p class="lead">Move o vídeo até ao momento certo (usa a pré-visualização à esquerda) e clica numa animação para a colocar nesse instante. Cada uma fica guardada com o segundo onde entra.</p>
+    <div class="box"><h3>No teu vídeo (${st.extras.length})</h3><div class="xlist">${st.extras.length ? [...st.extras].sort((a, b) => a.start - b.start).map(e => {
+      const d = EXTRAS[e.type];
+      return `<div class="xitem" data-x="${e.id}"><div class="hd"><b>${d.name}</b>${d.global ? '<span class="time">vídeo inteiro</span>' : `<button class="btn sm" data-xgo="${e.id}">▶ ${fmt1(e.start)}</button>`}<button class="btn sm" data-xdel="${e.id}">Remover</button></div>
+      ${(d.f.length || !d.global) ? `<div class="row">${d.f.map(([k, l]) => `<div class="field"><label>${l}</label><input type="text" data-xf="${k}" value="${esc(e[k])}"></div>`).join('')}
+      ${d.global ? '' : `<div class="field num"><label>Início (s)</label><input type="number" data-xf="start" step=".1" min="0" value="${(+e.start).toFixed(1)}"></div><div class="field num"><label>Duração</label><input type="number" data-xf="dur" step=".1" min=".2" value="${(+e.dur).toFixed(1)}"></div>`}
+      ${d.cat === 'ov' && 'y' in d ? `<div class="field num" style="flex:0 0 130px"><label>Altura</label><input type="range" data-xf="y" min=".12" max=".85" step=".01" value="${e.y}"></div>` : ''}</div>` : ''}</div>`;
+    }).join('') : '<div class="empty">Ainda nenhuma animação. Escolhe uma em baixo.</div>'}</div></div>
+    ${seg('xtab', [['ov', 'Sobreposições'], ['mo', 'Transições']], xTab)}
+    <div class="grid" style="margin-top:14px">${list.map(([k, d], i) => cardHTML('extra', k, d.name, d.desc, i + 1, false, st.extras.some(e => e.type === k) ? 'Usado' : '')).join('')}</div>
+    <p class="note" style="margin-top:20px">Zoom e outros efeitos sobre a própria imagem não aparecem aqui de propósito — esses fazes diretamente no Premiere, sobre o vídeo real. Aqui ficam só as coisas que se <em>sobrepõem</em> ao vídeo, para poderes exportá-las isoladas.</p>`;
+  } else if (id === 'exportar') {
+    const list = exportList();
+    const R = RES[st.resolution];
+    h = `<h2>Exportar <em>animações</em></h2><p class="lead">Cada animação sai como o seu próprio ficheiro .webm, já renderizado em ${R.w}×${R.h} px — os mesmos pixels do teu projeto — com fundo transparente, pronto a largar numa faixa acima do teu vídeo já cortado no Premiere. Não precisas de reescalar nem de reposicionar nada. O nome de cada ficheiro começa pelo segundo onde a animação entra no teu vídeo.</p>
+    <div class="sum">
+      <div><span class="lbl">Animações</span><b>${list.length}</b></div>
+      <div><span class="lbl">Pixels de saída</span><b>${R.w}×${R.h} px</b></div>
+      <div><span class="lbl">Formato</span><b>WebM · alpha (transparente)</b></div>
+    </div>
+    <div class="box"><div class="row">
+      <div class="field" style="flex:0 0 auto"><span class="lbl">Formato de exportação (pixels)</span>${seg('res', [['1080', 'Full HD · 1080×1920'], ['4k', '4K · 2160×3840']], st.resolution)}</div>
+      <button class="btn pri" id="expAllBtn" ${list.length ? '' : 'disabled'}>Exportar todas (${list.length})</button>
+    </div>
+    <p class="note" style="margin:14px 0 0">${video.videoWidth ? `Vídeo carregado: ${video.videoWidth}×${video.videoHeight} px — ` : ''}escolhe aqui o mesmo formato (Full HD ou 4K) da sequência que tens aberta no Premiere, para os pixels baterem certo ao largares o clip na timeline sem o teres de escalar.</p>
+    <p class="note" style="margin:10px 0 0">A transparência alpha funciona de forma fiável no Chrome e no Edge. Se abrires um clip e aparecer com fundo preto em vez de transparente, confirma que estás a importar no Premiere como WebM (não precisas de chroma key).</p>
+    <p class="note" style="margin:10px 0 0">Cada ficheiro é descarregado automaticamente pelo próprio navegador para a tua pasta de Downloads habitual — tal como qualquer download normal — assim que acaba de ser gerado. Não precisas de clicar em mais nada.</p></div>
+    ${!list.length ? '<p class="note">Ainda não colocaste nenhuma animação nem hook. Volta aos passos 2 e 3.</p>' : ''}
+    <div class="box"><h3>Ficheiros</h3><div class="explist" id="explist">${list.map((e, i) => `
+      <div class="expitem" data-exp="${e.id}"><div class="nm"><b>${itemFilename(e, i)}</b><span>${EXTRAS[e.type]?.name || (e.type === 'hook' ? 'Hook' : e.type)} · entra aos ${fmt1(e.start)} · dura ${(+e.dur).toFixed(1)}s</span></div><div class="st">por exportar</div></div>`).join('')}</div></div>`;
+  }
+  P.innerHTML = h;
+  bindPanel();
+  drawMarks();
+  requestAnimationFrame(refreshCards);
+  req();
+}
+
+function bindPanel() {
+  const P = $('#panel');
+  const drop = $('#drop');
+  if (drop) {
+    $('#pickBtn').onclick = () => $('#file').click();
+    ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+    ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+    drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) loadVideo(f); });
+  }
+  P.querySelectorAll('[data-start]').forEach(b => b.onclick = () => go(1));
+  P.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => pick(b.dataset.pick, b.dataset.id));
+  P.querySelectorAll('[data-seg]').forEach(sg => sg.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return; const v = b.dataset.v, k = sg.dataset.seg;
+    if (k === 'pos' || k === 'dur') st.hook[k] = v;
+    else if (k === 'hookon') st.hook.on = v === '1';
+    else if (k === 'xtab') xTab = v;
+    else if (k === 'res') { st.resolution = v; st.resTouched = true; }
+    save(); renderPanel();
+  });
+  const h1 = $('#h1'), h2 = $('#h2'), hstart = $('#hstart');
+  if (h1) { const f = () => { st.hook.l1 = h1.value; st.hook.l2 = h2.value; save(); req(); refreshCards(); }; h1.oninput = f; h2.oninput = f; }
+  if (hstart) hstart.oninput = () => { st.hook.start = Math.max(0, +hstart.value || 0); save(); };
+  P.querySelectorAll('[data-xgo]').forEach(b => b.onclick = () => { const e = st.extras.find(x => x.id === b.dataset.xgo); if (vReady) { video.currentTime = Math.max(0, e.start); req(); } });
+  P.querySelectorAll('[data-xdel]').forEach(b => b.onclick = () => { st.extras = st.extras.filter(e => e.id !== b.dataset.xdel); save(); renderPanel(); });
+  P.querySelectorAll('[data-x] [data-xf]').forEach(inp => inp.oninput = () => {
+    const e = st.extras.find(x => x.id === inp.closest('[data-x]').dataset.x), k = inp.dataset.xf;
+    e[k] = ['start', 'dur', 'y'].includes(k) ? Math.max(k === 'dur' ? .2 : 0, +inp.value || 0) : inp.value;
+    save(); req(); drawMarks();
+  });
+  if ($('#expAllBtn')) $('#expAllBtn').onclick = exportAll;
+}
+
+function pick(kind, id) {
+  if (kind === 'palette') { st.palette = id; st.look = ''; }
+  else if (kind === 'font') { st.font = id; st.look = ''; }
+  else if (kind === 'hook') st.hook.style = id;
+  else if (kind === 'look') { applyLook(LOOKS.find(l => l.id === id)); toast('Look aplicado'); }
+  else if (kind === 'extra') {
+    const d = EXTRAS[id];
+    if (d.global) { if (st.extras.some(e => e.type === id)) return toast('Já está no vídeo'); st.extras.push(mkExtra(id, 0)); }
+    else {
+      let s = vReady ? video.currentTime : 0; if (s < .3) s = .8;
+      if (srcDur && s + d.dur > srcDur) s = Math.max(0, srcDur - d.dur);
+      st.extras.push(mkExtra(id, s));
+      toast(`${d.name} em ${fmt1(s)}`);
+    }
+  }
+  save(); renderPanel(); req();
+}
+function mkExtra(type, start) {
+  const d = EXTRAS[type];
+  return { id: uid(), type, start: +Math.max(0, start).toFixed(2), dur: d.global ? (srcDur || 10) : d.dur, text: d.text || '', text2: d.text2 || '', y: d.y ?? .4 };
+}
+function lookState(L) { return { ...st, palette: L.palette, font: L.font, hook: { ...st.hook, on: true, style: L.hook } }; }
+function applyLook(L) { Object.assign(st, { palette: L.palette, font: L.font, hook: { ...st.hook, on: true, style: L.hook }, look: L.id }); }
+
+/* =========================================================
+   Exportação — cada animação é o SEU PRÓPRIO clip WebM
+   transparente (alpha), sem o vídeo por baixo. O nome do
+   ficheiro leva o segundo do vídeo onde a animação entra.
+   ========================================================= */
+let exporting2 = false, cancelExport = false;
+function pickAlphaMime() {
+  const opts = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+  if (typeof MediaRecorder === 'undefined') return null;
+  for (const m of opts) if (MediaRecorder.isTypeSupported(m)) return m;
+  return null;
+}
+function exportDrawFrame(ctx, w, h, s, item, t) {
+  ctx.save();
+  ctx.clearRect(0, 0, w, h);
+  ctx.setTransform(w / 1080, 0, 0, h / 1920, 0, 0);
+  ctx.textBaseline = 'alphabetic';
+  if (item.type === 'hook') {
+    drawHook(ctx, { ...s, hook: { ...s.hook, dur: 'all', start: 0 } }, t);
+  } else if (item.type === 'flash') {
+    drawFlash(ctx, t, item.dur);
+  } else if (item.type === 'barra') {
+    drawBarra(ctx, s, t, item.dur);
+  } else {
+    drawExtra(ctx, s, { ...item, start: 0 }, t);
+  }
+  ctx.restore();
+}
+function recordItem(item) {
+  return new Promise((resolve, reject) => {
+    const R = RES[st.resolution];
+    const mime = pickAlphaMime();
+    if (!mime) return reject(new Error('Este navegador não consegue gravar WebM.'));
+    const cv = document.createElement('canvas'); cv.width = R.w; cv.height = R.h;
+    const ctx = cv.getContext('2d', { alpha: true });
+    const stream = cv.captureStream(30);
+    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: st.resolution === '4k' ? 26e6 : 10e6 });
+    const chunks = []; rec.ondataavailable = ev => { if (ev.data.size) chunks.push(ev.data); };
+    rec.onerror = e => reject(e.error || new Error('Falha a gravar'));
+    rec.onstop = () => { stream.getTracks().forEach(t => t.stop()); resolve(new Blob(chunks, { type: 'video/webm' })); };
+    rec.start(200);
+    const t0 = performance.now();
+    const dur = Math.max(.3, item.dur);
+    const frame = () => {
+      if (cancelExport) { rec.stop(); return; }
+      const t = (performance.now() - t0) / 1000;
+      exportDrawFrame(ctx, R.w, R.h, st, item, Math.min(t, dur));
+      $('#busyBar').style.width = (clamp(t / dur) * 100).toFixed(0) + '%';
+      if (t >= dur) { setTimeout(() => rec.stop(), 60); return; }
+      requestAnimationFrame(frame);
+    };
+    frame();
+  });
+}
+async function exportAll() {
+  if (step !== 4) { go(4); return; }
+  const list = exportList();
+  if (!list.length) return toast('Nada para exportar — adiciona um hook ou animações primeiro');
+  if (exporting2) return;
+  if (!pickAlphaMime()) return toast('Este navegador não consegue gravar WebM — experimenta Chrome ou Edge');
+  exporting2 = true; cancelExport = false; exporting = true;
+  $('#phoneBox').classList.add('alpha');
+  $('#busy').classList.add('on'); $('#busyBar').style.width = '0%';
+  const rows = $$('#explist .expitem');
+  for (let i = 0; i < list.length && !cancelExport; i++) {
+    const item = list[i], row = rows.find(r => r.dataset.exp === item.id) || rows[i];
+    $('#busyMsg').textContent = `A exportar ${i + 1} de ${list.length}…`;
+    $('#busySub').textContent = itemFilename(item, i);
+    if (row) row.querySelector('.st').textContent = 'a exportar…';
+    try {
+      exportDrawFrame(pctx, pv.width, pv.height, st, item, 0);
+      const blob = await recordItem(item);
+      const name = itemFilename(item, i);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      if (row) { row.classList.add('done'); row.querySelector('.st').textContent = (blob.size / 1048576).toFixed(1) + ' MB'; }
+    } catch (err) {
+      if (row) row.querySelector('.st').textContent = 'falhou';
+      console.warn('export', item, err);
+    }
+  }
+  exporting2 = false; exporting = false;
+  $('#busy').classList.remove('on'); $('#phoneBox').classList.remove('alpha'); req();
+  toast(cancelExport ? 'Exportação cancelada' : 'Exportação concluída — ficheiros na pasta de downloads');
+}
+$('#busyCancel').onclick = () => { cancelExport = true; };
+
+/* ---------------- Diversos ---------------- */
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2800); }
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && !/INPUT|TEXTAREA|SELECT|BUTTON/.test(document.activeElement.tagName)) { e.preventDefault(); $('#playBtn').click(); }
+});
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => { e.preventDefault(); const f = e.dataTransfer?.files?.[0]; if (f && !e.target.closest?.('#drop')) loadVideo(f); });
+
+async function loadFonts() {
+  const specs = new Set();
+  FONTS.forEach(f => { specs.add(fs(f.d, 40)); specs.add(fs(f.b, 40)); });
+  ['500 40px Inter', '700 40px Inter', '800 40px Inter'].forEach(s => specs.add(s));
+  await Promise.all([...specs].map(s => document.fonts.load(s).catch(() => {})));
+  req(); refreshCards();
+}
+
+renderPanel();
+loadFonts();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
